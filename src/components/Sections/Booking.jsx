@@ -7,8 +7,8 @@ const Booking = () => {
     const [formData, setFormData] = useState({
         nombre: '',
         servicio: 'Masajes',
-        fecha: '',
-        hora: '',
+        fecha: new Date().toISOString().split('T')[0],
+        hora: '10:00',
         mensaje: ''
     });
     const [showServices, setShowServices] = useState(false);
@@ -105,14 +105,32 @@ const Booking = () => {
 
                             <div className="form-group">
                                 <label><Calendar size={18} /> Fecha</label>
-                                <input type="date" name="fecha" required onChange={handleChange} />
+                                <div className="date-time-wrapper">
+                                    <input
+                                        type="date"
+                                        name="fecha"
+                                        required
+                                        onChange={handleChange}
+                                        value={formData.fecha}
+                                    />
+                                    <ChevronDown size={18} className="field-chevron" />
+                                </div>
                             </div>
                         </div>
 
                         <div className="form-row">
                             <div className="form-group">
                                 <label><Clock size={18} /> Hora Preferida</label>
-                                <input type="time" name="hora" required onChange={handleChange} />
+                                <div className="date-time-wrapper">
+                                    <input
+                                        type="time"
+                                        name="hora"
+                                        required
+                                        onChange={handleChange}
+                                        value={formData.hora}
+                                    />
+                                    <ChevronDown size={18} className="field-chevron" />
+                                </div>
                             </div>
                         </div>
 

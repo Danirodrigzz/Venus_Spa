@@ -38,6 +38,9 @@ const Footer = () => {
 
                 <div className="footer-bottom">
                     <p>&copy; {new Date().getFullYear()} Venus Elegant Spa. Todos los derechos reservados.</p>
+                    <p style={{ marginTop: '10px' }}>
+                        Diseñado por <a href="https://portafolio-rust-eight.vercel.app" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>portafolio-rust-eight.vercel.app</a> con mucho amor
+                    </p>
                 </div>
             </div>
         </footer>

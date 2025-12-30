@@ -10,7 +10,7 @@ const WhatsAppButton = () => {
             target="_blank"
             rel="noopener noreferrer"
         >
-            <IconBrandWhatsapp size={35} stroke={1.5} />
+            <IconBrandWhatsapp stroke={1.5} />
             <span className="tooltip">Chatea con nosotros</span>
         </a>
     );

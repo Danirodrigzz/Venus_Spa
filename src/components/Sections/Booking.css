@@ -273,3 +273,31 @@
     font-size: 0.95rem;
     opacity: 0.9;
 }
+
+.date-time-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.date-time-wrapper input {
+    width: 100%;
+    padding-right: 45px;
+    background: var(--white);
+    appearance: none;
+}
+
+.field-chevron {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.date-time-wrapper input::-webkit-inner-spin-button,
+.date-time-wrapper input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
