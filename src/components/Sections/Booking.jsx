@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, User, MessageSquare, Send } from 'lucide-react';
+import { Calendar, Clock, User, MessageSquare, Send, ChevronDown, MapPin, Phone, Mail } from 'lucide-react';
 import './Booking.css';
 
 const Booking = () => {
@@ -11,6 +11,9 @@ const Booking = () => {
         hora: '',
         mensaje: ''
     });
+    const [showServices, setShowServices] = useState(false);
+
+    const services = ["Masajes", "Faciales", "Aromaterapia", "Manicura/Pedicura", "Depilación"];
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -37,12 +40,25 @@ const Booking = () => {
 
                         <div className="contact-details">
                             <div className="detail-item">
-                                <strong>Ubicación:</strong>
-                                <span>Plaza Rubi Av. España #69 3er nivel, local 303 Santo Domingo, Éste.</span>
+                                <div className="detail-icon"><MapPin size={22} /></div>
+                                <div className="detail-text">
+                                    <strong>Ubicación</strong>
+                                    <span>Plaza Rubi Av. España #69 3er nivel, local 303 Santo Domingo, Éste.</span>
+                                </div>
                             </div>
                             <div className="detail-item">
-                                <strong>Email:</strong>
-                                <span>venuselegantspa@gmail.com</span>
+                                <div className="detail-icon"><Phone size={22} /></div>
+                                <div className="detail-text">
+                                    <strong>Teléfono / WhatsApp</strong>
+                                    <span>+1 (849) 531-9662</span>
+                                </div>
+                            </div>
+                            <div className="detail-item">
+                                <div className="detail-icon"><Mail size={22} /></div>
+                                <div className="detail-text">
+                                    <strong>Email</strong>
+                                    <span>venuselegantspa@gmail.com</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -62,13 +78,29 @@ const Booking = () => {
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Servicio</label>
-                                <select name="servicio" onChange={handleChange}>
-                                    <option>Masajes</option>
-                                    <option>Faciales</option>
-                                    <option>Aromaterapia</option>
-                                    <option>Manicura/Pedicura</option>
-                                    <option>Depilación</option>
-                                </select>
+                                <div className={`custom-select-v2 ${showServices ? 'open' : ''}`} onClick={() => setShowServices(!showServices)}>
+                                    <div className="selected-value">
+                                        {formData.servicio}
+                                        <ChevronDown size={18} className={`chevron ${showServices ? 'rotate' : ''}`} />
+                                    </div>
+                                    {showServices && (
+                                        <div className="options-menu">
+                                            {services.map(service => (
+                                                <div
+                                                    key={service}
+                                                    className={`option-item-v2 ${formData.servicio === service ? 'active' : ''}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setFormData({ ...formData, servicio: service });
+                                                        setShowServices(false);
+                                                    }}
+                                                >
+                                                    {service}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="form-group">

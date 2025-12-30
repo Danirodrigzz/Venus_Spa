@@ -84,14 +84,17 @@
 
 .footer-contact li {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 15px;
     color: var(--accent);
     margin-bottom: 20px;
+    text-align: left;
 }
 
 .footer-contact svg {
     color: var(--primary);
+    flex-shrink: 0;
+    margin-top: 4px;
 }
 
 .footer-bottom {
