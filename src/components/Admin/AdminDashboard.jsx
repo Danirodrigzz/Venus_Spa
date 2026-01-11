@@ -1982,8 +1982,8 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                             </div>
                         </div>
                         <div className="modal-actions" style={{ marginTop: '2rem' }}>
-                            <button className="btn-primary-admin" style={{ width: '100%' }} onClick={handleUpdatePassword}>
-                                Actualizar Contraseña y Entrar
+                            <button className="btn-primary-admin" style={{ width: '100%', justifyContent: 'center' }} onClick={handleUpdatePassword}>
+                                <Shield size={18} /> Actualizar Contraseña y Entrar
                             </button>
                         </div>
                     </div>
