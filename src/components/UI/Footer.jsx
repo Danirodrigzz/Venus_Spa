@@ -30,7 +30,7 @@ const Footer = () => {
                         <h3>Contacto</h3>
                         <ul>
                             <li><MapPin size={18} /> Plaza Rubi Av. España #69, 3er nivel, local 303, Santo Domingo Este</li>
-                            <li><Phone size={18} /> +1 (849) 531-9662</li>
+                            <li><Phone size={18} /> +1 (849) 316-4217</li>
                             <li><Mail size={18} /> venuselegantspa@gmail.com</li>
                         </ul>
                     </div>
