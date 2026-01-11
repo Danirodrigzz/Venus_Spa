@@ -10,7 +10,7 @@ import {
     Plus, Filter, Download, UserPlus, MessageSquare,
     Mail, Edit2, Trash2, ExternalLink, ChevronDown,
     Menu, X, FileText, Wallet, Receipt, Shield,
-    Globe, Lock, User, Phone, MapPin, Check
+    Globe, Lock, User, Phone, MapPin, Check, Sparkles
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import jsPDF from 'jspdf';
@@ -63,7 +63,7 @@ const CustomSelect = ({ value, options, onChange, placeholder = "Seleccionar", w
     );
 };
 
-const AdminDashboard = ({ onLogout }) => {
+const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -98,6 +98,15 @@ const AdminDashboard = ({ onLogout }) => {
     const [notifications, setNotifications] = useState([]);
     const [expenses, setExpenses] = useState([]);
     const [showNewExpenseModal, setShowNewExpenseModal] = useState(false);
+    const [showResetModal, setShowResetModal] = useState(isResetting);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    // Services Management States
+    const [showNewServiceModal, setShowNewServiceModal] = useState(false);
+    const [showEditServiceModal, setShowEditServiceModal] = useState(false);
+    const [editingService, setEditingService] = useState(null);
+    const [newService, setNewService] = useState({ title: '', description: '', price: 0, icon_name: 'Sparkles', show_price: true });
     const [newExpense, setNewExpense] = useState({ concepto: '', categoria: 'Suministros', monto: '', fecha: new Date().toISOString().split('T')[0] });
     const [showNotifications, setShowNotifications] = useState(false);
     const [activeSettingsSection, setActiveSettingsSection] = useState('general');
@@ -121,6 +130,34 @@ const AdminDashboard = ({ onLogout }) => {
         setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
     };
 
+    const handleUpdatePassword = async () => {
+        if (newPassword !== confirmPassword) {
+            showToast('Las contraseñas no coinciden', 'error');
+            return;
+        }
+        if (newPassword.length < 6) {
+            showToast('La contraseña debe tener al menos 6 caracteres', 'error');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            if (error) throw error;
+            showToast('Contraseña actualizada con éxito');
+            setShowResetModal(false);
+            onResetComplete();
+        } catch (error) {
+            showToast(error.message, 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (isResetting) setShowResetModal(true);
+    }, [isResetting]);
+
     useEffect(() => {
         fetchAllData();
     }, []);
@@ -143,7 +180,7 @@ const AdminDashboard = ({ onLogout }) => {
     };
 
     const fetchServicesList = async () => {
-        const { data } = await supabase.from('services').select('id, title');
+        const { data } = await supabase.from('services').select('*').order('id', { ascending: true });
         if (data) {
             setDbServices(data);
             if (!newApp.servicio && data.length > 0) {
@@ -211,9 +248,21 @@ const AdminDashboard = ({ onLogout }) => {
     };
 
     const fetchExpenses = async () => {
-        // En un caso real tendrías tabla de expenses, aquí simulamos o usamos local
-        // const { data } = await supabase.from('expenses').select('*');
-        // if (data) setExpenses(data);
+        const { data, error } = await supabase
+            .from('expenses')
+            .select('*')
+            .order('date', { ascending: false });
+
+        if (!error && data) {
+            const formatted = data.map(exp => ({
+                id: exp.id,
+                concepto: exp.concept,
+                categoria: exp.category,
+                monto: exp.amount,
+                fecha: exp.date
+            }));
+            setExpenses(formatted);
+        }
     };
 
     const fetchNotifications = async () => {
@@ -871,21 +920,70 @@ const AdminDashboard = ({ onLogout }) => {
         setShowEditExpenseModal(true);
     };
 
-    const saveEditExpense = () => {
-        setExpenses(expenses.map(e => e.id === editingExpense.id ? editingExpense : e));
-        setShowEditExpenseModal(false);
-        setEditingExpense(null);
+    const saveEditExpense = async () => {
+        try {
+            const { error } = await supabase
+                .from('expenses')
+                .update({
+                    concept: editingExpense.concepto,
+                    category: editingExpense.categoria,
+                    amount: editingExpense.monto,
+                    date: editingExpense.fecha
+                })
+                .eq('id', editingExpense.id);
+
+            if (error) throw error;
+
+            setExpenses(expenses.map(e => e.id === editingExpense.id ? editingExpense : e));
+            setShowEditExpenseModal(false);
+            setEditingExpense(null);
+            showToast('Gasto actualizado');
+        } catch (error) {
+            console.error('Error saving expense:', error);
+            showToast('Error: ' + (error.message || 'No se pudo guardar'), 'error');
+        }
     };
 
-    const handleDeleteExpense = (id) => {
-        setExpenses(expenses.filter(e => e.id !== id));
+    const handleDeleteExpense = async (id) => {
+        if (!window.confirm('¿Estás seguro de eliminar este gasto?')) return;
+        try {
+            const { error } = await supabase
+                .from('expenses')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            setExpenses(expenses.filter(e => e.id !== id));
+            showToast('Gasto eliminado');
+        } catch (error) {
+            console.error('Error deleting expense:', error);
+            showToast('Error al eliminar gasto', 'error');
+        }
     };
 
-    const handleCreateExpense = () => {
-        const id = expenses.length + 1;
-        setExpenses([...expenses, { ...newExpense, id, monto: parseFloat(newExpense.monto) }]);
-        setShowNewExpenseModal(false);
-        setNewExpense({ concepto: '', categoria: 'Suministros', monto: '', fecha: new Date().toISOString().split('T')[0] });
+    const handleCreateExpense = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('expenses')
+                .insert([{
+                    concept: newExpense.concepto,
+                    category: newExpense.categoria,
+                    amount: parseFloat(newExpense.monto),
+                    date: newExpense.fecha
+                }])
+                .select();
+
+            if (error) throw error;
+
+            fetchExpenses();
+            setShowNewExpenseModal(false);
+            setNewExpense({ concepto: '', categoria: 'Suministros', monto: '', fecha: new Date().toISOString().split('T')[0] });
+            showToast('Gasto registrado con éxito');
+        } catch (error) {
+            console.error('Error creating expense:', error);
+            showToast('Error: ' + (error.message || 'No se pudo registrar el gasto'), 'error');
+        }
     };
 
     const filteredExpenses = expenses.filter(expense => {
@@ -894,16 +992,178 @@ const AdminDashboard = ({ onLogout }) => {
         return matchesSearch && matchesFilter;
     });
 
+    const handleEditService = (service) => {
+        setEditingService(service);
+        setShowEditServiceModal(true);
+    };
+
+    const saveEditService = async () => {
+        if (!editingService?.id) return;
+        try {
+            const { error } = await supabase
+                .from('services')
+                .update({
+                    title: editingService.title,
+                    description: editingService.description,
+                    price: parseFloat(editingService.price) || 0,
+                    icon_name: editingService.icon_name,
+                    show_price: editingService.show_price
+                })
+                .eq('id', editingService.id);
+
+            if (error) throw error;
+
+            await fetchServicesList();
+            setShowEditServiceModal(false);
+            setEditingService(null);
+            showToast('Servicio actualizado');
+        } catch (error) {
+            console.error('Error saving service:', error);
+            showToast('Error: ' + (error.message || 'No se pudo guardar'), 'error');
+        }
+    };
+
+    const handleDeleteService = async (id) => {
+        if (!window.confirm('¿Estás seguro de eliminar este servicio? Esto puede afectar a los reportes de citas pasadas.')) return;
+        try {
+            const { error } = await supabase
+                .from('services')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            setDbServices(dbServices.filter(s => s.id !== id));
+            showToast('Servicio eliminado');
+        } catch (error) {
+            console.error('Error deleting service:', error);
+            showToast('Error al eliminar servicio', 'error');
+        }
+    };
+
+    const handleCreateService = async () => {
+        try {
+            const { error } = await supabase
+                .from('services')
+                .insert([{
+                    title: newService.title,
+                    description: newService.description,
+                    price: parseFloat(newService.price) || 0,
+                    icon_name: newService.icon_name,
+                    show_price: newService.show_price
+                }]);
+
+            if (error) throw error;
+
+            await fetchServicesList();
+            setShowNewServiceModal(false);
+            setNewService({ title: '', description: '', price: 0, icon_name: 'Sparkles', show_price: true });
+            showToast('Nuevo servicio creado');
+        } catch (error) {
+            console.error('Error creating service:', error);
+            showToast('Error: ' + (error.message || 'No se pudo crear'), 'error');
+        }
+    };
+
+    const renderServices = () => (
+        <>
+            <div className="content-header">
+                <div>
+                    <h1>Gestión de Servicios</h1>
+                    <p>Configura los masajes, precios y visibilidad.</p>
+                </div>
+                <button className="btn-primary-admin" onClick={() => setShowNewServiceModal(true)}>
+                    <Plus size={18} /> Nuevo Servicio
+                </button>
+            </div>
+
+            <div className="dashboard-card full-width">
+                <div className="table-wrapper">
+                    <table className="premium-table">
+                        <thead>
+                            <tr>
+                                <th>Servicio</th>
+                                <th>Descripción</th>
+                                <th>Precio</th>
+                                <th>Estado Web</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {dbServices.map((service) => (
+                                <tr key={service.id}>
+                                    <td data-label="Servicio">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <div className="icon-box-small" style={{ background: 'rgba(172, 109, 57, 0.1)', color: '#AC6D39', padding: '8px', borderRadius: '8px' }}>
+                                                <Sparkles size={16} />
+                                            </div>
+                                            <strong>{service.title}</strong>
+                                        </div>
+                                    </td>
+                                    <td data-label="Descripción" style={{ maxWidth: '300px' }} className="truncate-text">{service.description}</td>
+                                    <td data-label="Precio"><strong>${service.price}</strong></td>
+                                    <td data-label="Estado Web">
+                                        <span className={`status-pill ${service.show_price ? 'approved' : 'pending'}`}>
+                                            {service.show_price ? 'Precio Público' : 'Precio Privado'}
+                                        </span>
+                                    </td>
+                                    <td data-label="Acciones">
+                                        <div className="action-row">
+                                            <button className="action-btn edit" onClick={() => handleEditService(service)} title="Editar">
+                                                <Edit2 size={16} />
+                                            </button>
+                                            <button className="action-btn delete" onClick={() => handleDeleteService(service.id)} title="Eliminar">
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </>
+    );
+
     const getFinancialData = () => {
-        // En un sistema real, aquí agruparíamos ingresos de citas y gastos por mes
-        return [
-            { name: 'Ene', ingresos: 4500, gastos: expenses.reduce((acc, curr) => acc + curr.monto, 0) },
-            { name: 'Feb', ingresos: 5200, gastos: 1500 },
-            { name: 'Mar', ingresos: 4800, gastos: 1100 },
-            { name: 'Abr', ingresos: 6100, gastos: 1800 },
-            { name: 'May', ingresos: 5900, gastos: 1400 },
-            { name: 'Jun', ingresos: 7200, gastos: 2100 },
-        ];
+        const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        const currentMonthIdx = new Date().getMonth();
+
+        // Solo mostramos los últimos 6 meses
+        const last6Months = [];
+        for (let i = 5; i >= 0; i--) {
+            const m = (currentMonthIdx - i + 12) % 12;
+            last6Months.push({
+                name: months[m],
+                monthIdx: m,
+                ingresos: 0,
+                gastos: 0
+            });
+        }
+
+        // Sumar ingresos de citas aprobadas
+        appointments.filter(a => a.status === 'aprobada').forEach(app => {
+            const appDate = new Date(app.fecha);
+            const appMonth = appDate.getMonth();
+            const dataPoint = last6Months.find(d => d.monthIdx === appMonth);
+            if (dataPoint) {
+                const service = dbServices.find(s => s.title === app.servicio);
+                dataPoint.ingresos += (service?.price || 0);
+            }
+        });
+
+        // Sumar gastos
+        expenses.forEach(exp => {
+            const expDate = new Date(exp.fecha);
+            const expMonth = expDate.getMonth();
+            const dataPoint = last6Months.find(d => d.monthIdx === expMonth);
+            if (dataPoint) {
+                dataPoint.gastos += exp.monto || 0;
+            }
+        });
+
+        return last6Months;
     };
 
     const renderExpenses = () => (
@@ -1051,8 +1311,8 @@ const AdminDashboard = ({ onLogout }) => {
                 <div className="premium-stat-card">
                     <div className="stat-body">
                         <label>Ingresos Totales</label>
-                        <h2>$12,450.00</h2>
-                        <span className="trend positive">+15.2% esta temporada</span>
+                        <h2>{stats.revenue}</h2>
+                        <span className="trend positive">Basado en citas aprobadas</span>
                     </div>
                 </div>
                 <div className="premium-stat-card">
@@ -1351,7 +1611,12 @@ const AdminDashboard = ({ onLogout }) => {
         approved: appointments.filter(a => a.status === 'aprobada').length,
         rejected: appointments.filter(a => a.status === 'rechazada').length,
         pending: appointments.filter(a => a.status === 'pendiendo').length,
-        revenue: '$12,450'
+        revenue: `$${appointments
+            .filter(a => a.status === 'aprobada')
+            .reduce((acc, curr) => {
+                const service = dbServices.find(s => s.title === curr.servicio);
+                return acc + (service?.price || 0);
+            }, 0).toLocaleString()}`
     };
 
     return (
@@ -1369,6 +1634,7 @@ const AdminDashboard = ({ onLogout }) => {
                     <button className={`nav-item ${activeTab === 'appointments' ? 'active' : ''}`} onClick={() => handleTabChange('appointments')}><Calendar size={20} /><span>Citas</span></button>
                     <button className={`nav-item ${activeTab === 'clients' ? 'active' : ''}`} onClick={() => handleTabChange('clients')}><Users size={20} /><span>Clientes</span></button>
                     <button className={`nav-item ${activeTab === 'expenses' ? 'active' : ''}`} onClick={() => handleTabChange('expenses')}><Receipt size={20} /><span>Gastos</span></button>
+                    <button className={`nav-item ${activeTab === 'services' ? 'active' : ''}`} onClick={() => handleTabChange('services')}><Sparkles size={20} /><span>Servicios</span></button>
                     <button className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`} onClick={() => handleTabChange('reports')}><TrendingUp size={20} /><span>Reportes</span></button>
                 </nav>
                 <div className="sidebar-footer">
@@ -1433,6 +1699,7 @@ const AdminDashboard = ({ onLogout }) => {
                     {activeTab === 'appointments' && renderAppointments()}
                     {activeTab === 'clients' && renderClients()}
                     {activeTab === 'expenses' && renderExpenses()}
+                    {activeTab === 'services' && renderServices()}
                     {activeTab === 'reports' && renderReports()}
                     {activeTab === 'settings' && renderSettings()}
                 </div>
@@ -1583,6 +1850,78 @@ const AdminDashboard = ({ onLogout }) => {
                 </div>
             )}
 
+            {showNewServiceModal && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal details-modal">
+                        <div className="modal-header-details"><h2>Nuevo Servicio</h2></div>
+                        <div className="edit-form">
+                            <div className="form-group-admin"><label>Título</label><input type="text" className="premium-input-field" placeholder="Ej: Masaje de Piedras" value={newService.title} onChange={(e) => setNewService({ ...newService, title: e.target.value })} /></div>
+                            <div className="form-group-admin"><label>Descripción</label><textarea className="premium-input-field" rows="3" value={newService.description} onChange={(e) => setNewService({ ...newService, description: e.target.value })} /></div>
+                            <div className="details-grid" style={{ padding: 0 }}>
+                                <div className="form-group-admin"><label>Precio ($)</label><input type="number" className="premium-input-field" value={newService.price} onChange={(e) => setNewService({ ...newService, price: e.target.value })} /></div>
+                                <div className="form-group-admin">
+                                    <label>Icono</label>
+                                    <CustomSelect
+                                        value={newService.icon_name}
+                                        options={['Sparkles', 'Flower2', 'Wind', 'Heart', 'Waves', 'Zap', 'Flame', 'Activity']}
+                                        onChange={(val) => setNewService({ ...newService, icon_name: val })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="settings-toggle-item small" style={{ marginTop: '1rem' }}>
+                                <div>
+                                    <strong>Mostrar Precio en Web</strong>
+                                    <p>Si se apaga, el cliente no verá el precio.</p>
+                                </div>
+                                <div className={`premium-switch ${newService.show_price ? 'active' : ''}`} onClick={() => setNewService({ ...newService, show_price: !newService.show_price })}>
+                                    <div className="switch-handle"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
+                            <button className="btn-modal-cancel" onClick={() => setShowNewServiceModal(false)}>Cancelar</button>
+                            <button className="btn-primary-admin" onClick={handleCreateService}>Crear Servicio</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showEditServiceModal && editingService && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal details-modal">
+                        <div className="modal-header-details"><h2>Editar Servicio</h2></div>
+                        <div className="edit-form">
+                            <div className="form-group-admin"><label>Título</label><input type="text" className="premium-input-field" value={editingService.title} onChange={(e) => setEditingService({ ...editingService, title: e.target.value })} /></div>
+                            <div className="form-group-admin"><label>Descripción</label><textarea className="premium-input-field" rows="3" value={editingService.description} onChange={(e) => setEditingService({ ...editingService, description: e.target.value })} /></div>
+                            <div className="details-grid" style={{ padding: 0 }}>
+                                <div className="form-group-admin"><label>Precio ($)</label><input type="number" className="premium-input-field" value={editingService.price} onChange={(e) => setEditingService({ ...editingService, price: e.target.value })} /></div>
+                                <div className="form-group-admin">
+                                    <label>Icono</label>
+                                    <CustomSelect
+                                        value={editingService.icon_name}
+                                        options={['Sparkles', 'Flower2', 'Wind', 'Heart', 'Waves', 'Zap', 'Flame', 'Activity']}
+                                        onChange={(val) => setEditingService({ ...editingService, icon_name: val })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="settings-toggle-item small" style={{ marginTop: '1rem' }}>
+                                <div>
+                                    <strong>Mostrar Precio en Web</strong>
+                                    <p>Si se apaga, el cliente no verá el precio.</p>
+                                </div>
+                                <div className={`premium-switch ${editingService.show_price ? 'active' : ''}`} onClick={() => setEditingService({ ...editingService, show_price: !editingService.show_price })}>
+                                    <div className="switch-handle"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
+                            <button className="btn-modal-cancel" onClick={() => setShowEditServiceModal(false)}>Cancelar</button>
+                            <button className="btn-primary-admin" onClick={saveEditService}>Guardar Cambios</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {selectedClient && (
                 <div className="admin-modal-overlay">
                     <div className="premium-modal client-modal-large">
@@ -1610,6 +1949,43 @@ const AdminDashboard = ({ onLogout }) => {
                     <div className="toast-content">
                         <Check size={18} />
                         <span>{toast.message}</span>
+                    </div>
+                </div>
+            )}
+            {showResetModal && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal details-modal">
+                        <div className="modal-header-details"><h2>Restablecer Contraseña</h2></div>
+                        <div className="edit-form">
+                            <p style={{ color: '#64748b', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                                Por favor ingresa tu nueva contraseña maestra para el panel.
+                            </p>
+                            <div className="form-group-admin">
+                                <label>Nueva Contraseña</label>
+                                <input
+                                    type="password"
+                                    className="premium-input-field"
+                                    placeholder="Mínimo 6 caracteres"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                />
+                            </div>
+                            <div className="form-group-admin">
+                                <label>Confirmar Contraseña</label>
+                                <input
+                                    type="password"
+                                    className="premium-input-field"
+                                    placeholder="Repite la contraseña"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-actions" style={{ marginTop: '2rem' }}>
+                            <button className="btn-primary-admin" style={{ width: '100%' }} onClick={handleUpdatePassword}>
+                                Actualizar Contraseña y Entrar
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

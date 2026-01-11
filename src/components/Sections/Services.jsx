@@ -80,7 +80,7 @@ const Services = () => {
                             </div>
                             <h3>{service.title}</h3>
                             <p>{service.description}</p>
-                            {service.price && <span className="service-price">${service.price}</span>}
+                            {service.show_price && service.price && <span className="service-price">${service.price}</span>}
                         </motion.div>
                     ))}
                 </div>

@@ -177,6 +177,59 @@ input::-webkit-credentials-auto-fill-button {
     font-weight: 600;
 }
 
+.login-success {
+    background: #ecfdf5;
+    color: #065f46;
+    padding: 0.75rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.forgot-link {
+    background: none;
+    border: none;
+    color: #AC6D39;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.forgot-link:hover {
+    color: #915b2f;
+    text-decoration: underline;
+}
+
+.forgot-instruction {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.back-to-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin: 1.5rem auto 0;
+    transition: color 0.2s;
+}
+
+.back-to-login:hover {
+    color: #1e293b;
+}
+
 .animate-spin {
     animation: spin 1s linear infinite;
 }

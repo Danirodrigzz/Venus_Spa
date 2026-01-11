@@ -2073,3 +2073,12 @@ input[type="time"].premium-input-field {
         transform: translateY(0) scale(1);
     }
 }
+
+/* Manejo de textos largos en tablas */
+.truncate-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100%;
+}
