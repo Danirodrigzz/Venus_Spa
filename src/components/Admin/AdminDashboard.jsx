@@ -1610,406 +1610,405 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                <div className="settings-footer-actions">
-                    <button className="btn-save-settings" onClick={handleSaveSettings}>
-                        <Check size={18} /> Guardar todos los cambios
-                    </button>
+                    <div className="settings-footer-actions">
+                        <button className="btn-save-settings" onClick={handleSaveSettings}>
+                            <Check size={18} /> Guardar todos los cambios
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
 
         </>
     );
 
 
-const stats = {
-    total: appointments.length,
-    approved: appointments.filter(a => a.status === 'aprobada').length,
-    rejected: appointments.filter(a => a.status === 'rechazada').length,
-    pending: appointments.filter(a => a.status === 'pendiendo').length,
-    revenue: `$${appointments
-        .filter(a => a.status === 'aprobada')
-        .reduce((acc, curr) => {
-            const service = dbServices.find(s => s.title === curr.servicio);
-            return acc + (service?.price || 0);
-        }, 0).toLocaleString()}`
-};
+    const stats = {
+        total: appointments.length,
+        approved: appointments.filter(a => a.status === 'aprobada').length,
+        rejected: appointments.filter(a => a.status === 'rechazada').length,
+        pending: appointments.filter(a => a.status === 'pendiendo').length,
+        revenue: `$${appointments
+            .filter(a => a.status === 'aprobada')
+            .reduce((acc, curr) => {
+                const service = dbServices.find(s => s.title === curr.servicio);
+                return acc + (service?.price || 0);
+            }, 0).toLocaleString()}`
+    };
 
-return (
-    <div className="admin-layout">
-        <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
-            <div className="sidebar-brand">
-                <div className="brand-circle">V</div>
-                <span>Venus<span>Spa</span></span>
-                <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
-                    <X size={24} />
-                </button>
-            </div>
-            <nav className="sidebar-nav">
-                <button className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => handleTabChange('dashboard')}><LayoutDashboard size={20} /><span>Dashboard</span></button>
-                <button className={`nav-item ${activeTab === 'appointments' ? 'active' : ''}`} onClick={() => handleTabChange('appointments')}><Calendar size={20} /><span>Citas</span></button>
-                <button className={`nav-item ${activeTab === 'clients' ? 'active' : ''}`} onClick={() => handleTabChange('clients')}><Users size={20} /><span>Clientes</span></button>
-                <button className={`nav-item ${activeTab === 'expenses' ? 'active' : ''}`} onClick={() => handleTabChange('expenses')}><Receipt size={20} /><span>Gastos</span></button>
-                <button className={`nav-item ${activeTab === 'services' ? 'active' : ''}`} onClick={() => handleTabChange('services')}><Sparkles size={20} /><span>Servicios</span></button>
-                <button className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`} onClick={() => handleTabChange('reports')}><TrendingUp size={20} /><span>Reportes</span></button>
-            </nav>
-            <div className="sidebar-footer">
-                <button className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => handleTabChange('settings')}><Settings size={20} /><span>Configuración</span></button>
-                <button className="nav-item logout" onClick={() => setShowLogoutModal(true)}><LogOut size={20} /><span>Cerrar Sesión</span></button>
-            </div>
-        </aside>
-
-        <main className="admin-main">
-            <header className="admin-topbar">
-                <div className="topbar-left">
-                    <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
-                        <Menu size={24} />
+    return (
+        <div className="admin-layout">
+            <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
+                <div className="sidebar-brand">
+                    <div className="brand-circle">V</div>
+                    <span>Venus<span>Spa</span></span>
+                    <button className="sidebar-close-btn" onClick={() => setSidebarOpen(false)}>
+                        <X size={24} />
                     </button>
-                    <div className="search-input-box desktop-only"><Search size={18} /><input type="text" placeholder="Buscar citas o clientes..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>
                 </div>
-                <div className="topbar-actions">
-                    <div className="notification-wrapper">
-                        <button className="icon-btn" onClick={() => setShowNotifications(!showNotifications)}>
-                            <Bell size={20} />
-                            {notifications.filter(n => n.unread).length > 0 && <span className="notification-badge"></span>}
-                        </button>
+                <nav className="sidebar-nav">
+                    <button className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => handleTabChange('dashboard')}><LayoutDashboard size={20} /><span>Dashboard</span></button>
+                    <button className={`nav-item ${activeTab === 'appointments' ? 'active' : ''}`} onClick={() => handleTabChange('appointments')}><Calendar size={20} /><span>Citas</span></button>
+                    <button className={`nav-item ${activeTab === 'clients' ? 'active' : ''}`} onClick={() => handleTabChange('clients')}><Users size={20} /><span>Clientes</span></button>
+                    <button className={`nav-item ${activeTab === 'expenses' ? 'active' : ''}`} onClick={() => handleTabChange('expenses')}><Receipt size={20} /><span>Gastos</span></button>
+                    <button className={`nav-item ${activeTab === 'services' ? 'active' : ''}`} onClick={() => handleTabChange('services')}><Sparkles size={20} /><span>Servicios</span></button>
+                    <button className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`} onClick={() => handleTabChange('reports')}><TrendingUp size={20} /><span>Reportes</span></button>
+                </nav>
+                <div className="sidebar-footer">
+                    <button className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => handleTabChange('settings')}><Settings size={20} /><span>Configuración</span></button>
+                    <button className="nav-item logout" onClick={() => setShowLogoutModal(true)}><LogOut size={20} /><span>Cerrar Sesión</span></button>
+                </div>
+            </aside>
 
-                        {showNotifications && (
-                            <div className="notification-dropdown" ref={notificationRef}>
-                                <div className="notif-header">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <h4>Notificaciones</h4>
-                                        <button
-                                            onClick={() => setShowNotifications(false)}
-                                            className="close-notif-btn"
-                                            style={{ padding: '4px', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', display: 'flex' }}
-                                        >
-                                            <X size={16} />
-                                        </button>
-                                    </div>
-                                    <button onClick={() => setNotifications(notifications.map(n => ({ ...n, unread: false })))}>Marcar todas como leídas</button>
-                                </div>
-                                <div className="notif-list">
-                                    {notifications.map(n => (
-                                        <div key={n.id} className={`notif-item ${n.unread ? 'unread' : ''}`}>
-                                            <p>{n.text}</p>
-                                            <span>{n.time}</span>
+            <main className="admin-main">
+                <header className="admin-topbar">
+                    <div className="topbar-left">
+                        <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
+                            <Menu size={24} />
+                        </button>
+                        <div className="search-input-box desktop-only"><Search size={18} /><input type="text" placeholder="Buscar citas o clientes..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>
+                    </div>
+                    <div className="topbar-actions">
+                        <div className="notification-wrapper">
+                            <button className="icon-btn" onClick={() => setShowNotifications(!showNotifications)}>
+                                <Bell size={20} />
+                                {notifications.filter(n => n.unread).length > 0 && <span className="notification-badge"></span>}
+                            </button>
+
+                            {showNotifications && (
+                                <div className="notification-dropdown" ref={notificationRef}>
+                                    <div className="notif-header">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <h4>Notificaciones</h4>
+                                            <button
+                                                onClick={() => setShowNotifications(false)}
+                                                className="close-notif-btn"
+                                                style={{ padding: '4px', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', display: 'flex' }}
+                                            >
+                                                <X size={16} />
+                                            </button>
                                         </div>
-                                    ))}
+                                        <button onClick={() => setNotifications(notifications.map(n => ({ ...n, unread: false })))}>Marcar todas como leídas</button>
+                                    </div>
+                                    <div className="notif-list">
+                                        {notifications.map(n => (
+                                            <div key={n.id} className={`notif-item ${n.unread ? 'unread' : ''}`}>
+                                                <p>{n.text}</p>
+                                                <span>{n.time}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="notif-footer">
+                                        <button>Ver todas las notificaciones</button>
+                                    </div>
                                 </div>
-                                <div className="notif-footer">
-                                    <button>Ver todas las notificaciones</button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                    <div className="user-profile">
-                        <img src="https://ui-avatars.com/api/?name=Admin+Spa&background=AC6D39&color=fff" alt="User" />
-                        <div className="user-info"><strong>Admin</strong><span>Administrador</span></div>
-                    </div>
-                </div>
-            </header>
-
-            <div className="admin-content">
-                {activeTab === 'dashboard' && renderDashboard()}
-                {activeTab === 'appointments' && renderAppointments()}
-                {activeTab === 'clients' && renderClients()}
-                {activeTab === 'expenses' && renderExpenses()}
-                {activeTab === 'services' && renderServices()}
-                {activeTab === 'reports' && renderReports()}
-                {activeTab === 'settings' && renderSettings()}
-            </div>
-        </main>
-
-        {/* Modals */}
-        {showLogoutModal && (
-            <div className="admin-modal-overlay">
-                <div className="premium-modal">
-                    <div className="modal-icon-warning"><LogOut size={32} /></div>
-                    <h2>¿Cerrar Sesión?</h2>
-                    <p>Estás a punto de salir del panel administrativo. ¿Deseas continuar?</p>
-                    <div className="modal-actions">
-                        <button className="btn-modal-cancel" onClick={() => setShowLogoutModal(false)}>Cancelar</button>
-                        <button className="btn-modal-confirm" onClick={handleLogout}>Sí, Salir</button>
-                    </div>
-                </div>
-            </div>
-        )}
-
-        {selectedAppointment && (
-            <div className="admin-modal-overlay">
-                <div className="premium-modal details-modal">
-                    <div className="modal-header-details">
-                        <div className="avatar-large">{selectedAppointment.nombre.charAt(0)}</div>
-                        <h2>Detalles de la Cita</h2>
-                        <span className={`status-pill ${selectedAppointment.status}`}>{selectedAppointment.status}</span>
-                    </div>
-                    <div className="details-grid">
-                        <div className="detail-box"><label>Cliente</label><strong>{selectedAppointment.nombre}</strong></div>
-                        <div className="detail-box"><label>Servicio</label><strong>{selectedAppointment.servicio}</strong></div>
-                        <div className="detail-box"><label>Fecha</label><strong>{selectedAppointment.fecha}</strong></div>
-                        <div className="detail-box"><label>Hora</label><strong>{selectedAppointment.hora}</strong></div>
-                    </div>
-                    <div className="detail-box full"><label>Mensaje / Notas</label><p>{selectedAppointment.mensaje || 'Sin mensaje adicional.'}</p></div>
-                    <div className="modal-actions">
-                        <button className="btn-modal-cancel" onClick={() => setSelectedAppointment(null)}>Cerrar</button>
-                        <button className="btn-primary-admin" onClick={() => { window.open(`https://wa.me/${settings.phone.replace(/[^0-9]/g, '')}`, '_blank'); }}>
-                            <MessageSquare size={18} /> Contactar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        )}
-
-        {showDeleteModal && (
-            <div className="admin-modal-overlay">
-                <div className="premium-modal">
-                    <div className="modal-icon-warning"><Trash2 size={32} /></div>
-                    <h2>¿Confirmar eliminación?</h2>
-                    <p>Esta acción no se puede deshacer.</p>
-                    <div className="modal-actions">
-                        <button className="btn-modal-cancel" onClick={() => setShowDeleteModal(false)}>Cancelar</button>
-                        <button className="btn-modal-confirm" onClick={confirmDelete}>Sí, Eliminar</button>
-                    </div>
-                </div>
-            </div>
-        )}
-
-        {showEditModal && editingClient && (
-            <div className="admin-modal-overlay">
-                <div className="premium-modal details-modal">
-                    <div className="modal-header-details"><h2>Editar Cliente</h2></div>
-                    <div className="edit-form">
-                        <div className="form-group-admin"><label>Nombre</label><input type="text" className="premium-input-field" value={editingClient.nombre} onChange={(e) => setEditingClient({ ...editingClient, nombre: e.target.value })} /></div>
-                        <div className="form-group-admin"><label>Email</label><input type="email" className="premium-input-field" value={editingClient.email} onChange={(e) => setEditingClient({ ...editingClient, email: e.target.value })} /></div>
-                        <div className="form-group-admin">
-                            <label>Categoría</label>
-                            <CustomSelect
-                                value={editingClient.status}
-                                options={['Nuevo', 'Frecuente', 'VIP']}
-                                onChange={(val) => setEditingClient({ ...editingClient, status: val })}
-                            />
+                            )}
+                        </div>
+                        <div className="user-profile">
+                            <img src="https://ui-avatars.com/api/?name=Admin+Spa&background=AC6D39&color=fff" alt="User" />
+                            <div className="user-info"><strong>Admin</strong><span>Administrador</span></div>
                         </div>
                     </div>
-                    <div className="modal-actions">
-                        <button className="btn-modal-cancel" onClick={() => setShowEditModal(false)}>Cancelar</button>
-                        <button className="btn-primary-admin" onClick={saveEditClient}>Guardar</button>
-                    </div>
-                </div>
-            </div>
-        )}
+                </header>
 
-        {showNewAppModal && (
-            <div className="admin-modal-overlay">
-                <div className="premium-modal details-modal">
-                    <div className="modal-header-details"><h2>Nueva Cita</h2></div>
-                    <div className="edit-form">
-                        <div className="form-group-admin"><label>Cliente</label><input type="text" className="premium-input-field" value={newApp.nombre} onChange={(e) => setNewApp({ ...newApp, nombre: e.target.value })} /></div>
-                        <div className="form-group-admin">
-                            <label>Servicio</label>
-                            <CustomSelect
-                                value={newApp.servicio}
-                                options={dbServices.length > 0 ? dbServices.map(s => s.title) : ['Masajes', 'Faciales', 'Manicure y Pedicure']}
-                                onChange={(val) => setNewApp({ ...newApp, servicio: val })}
-                            />
-                        </div>
-                        <div className="details-grid" style={{ padding: 0 }}>
-                            <div className="form-group-admin"><label>Fecha</label><input type="date" className="premium-input-field" value={newApp.fecha} onChange={(e) => setNewApp({ ...newApp, fecha: e.target.value })} /></div>
-                            <div className="form-group-admin"><label>Hora</label><input type="time" className="premium-input-field" value={newApp.hora} onChange={(e) => setNewApp({ ...newApp, hora: e.target.value })} /></div>
+                <div className="admin-content">
+                    {activeTab === 'dashboard' && renderDashboard()}
+                    {activeTab === 'appointments' && renderAppointments()}
+                    {activeTab === 'clients' && renderClients()}
+                    {activeTab === 'expenses' && renderExpenses()}
+                    {activeTab === 'services' && renderServices()}
+                    {activeTab === 'reports' && renderReports()}
+                    {activeTab === 'settings' && renderSettings()}
+                </div>
+            </main>
+
+            {/* Modals */}
+            {showLogoutModal && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal">
+                        <div className="modal-icon-warning"><LogOut size={32} /></div>
+                        <h2>¿Cerrar Sesión?</h2>
+                        <p>Estás a punto de salir del panel administrativo. ¿Deseas continuar?</p>
+                        <div className="modal-actions">
+                            <button className="btn-modal-cancel" onClick={() => setShowLogoutModal(false)}>Cancelar</button>
+                            <button className="btn-modal-confirm" onClick={handleLogout}>Sí, Salir</button>
                         </div>
                     </div>
-                    <div className="modal-actions">
-                        <button className="btn-modal-cancel" onClick={() => setShowNewAppModal(false)}>Cancelar</button>
-                        <button className="btn-primary-admin" onClick={handleCreateAppointment}>Crear</button>
-                    </div>
                 </div>
-            </div>
-        )}
+            )}
 
-        {showNewClientModal && (
-            <div className="admin-modal-overlay">
-                <div className="premium-modal details-modal">
-                    <div className="modal-header-details"><h2>Nuevo Cliente</h2></div>
-                    <div className="edit-form">
-                        <div className="form-group-admin"><label>Nombre</label><input type="text" className="premium-input-field" value={newClient.nombre} onChange={(e) => setNewClient({ ...newClient, nombre: e.target.value })} /></div>
-                        <div className="form-group-admin"><label>Email</label><input type="email" className="premium-input-field" value={newClient.email} onChange={(e) => setNewClient({ ...newClient, email: e.target.value })} /></div>
-                    </div>
-                    <div className="modal-actions">
-                        <button className="btn-modal-cancel" onClick={() => setShowNewClientModal(false)}>Cancelar</button>
-                        <button className="btn-primary-admin" onClick={handleCreateClient}>Registrar</button>
-                    </div>
-                </div>
-            </div>
-        )}
-
-        {showNewExpenseModal && (
-            <div className="admin-modal-overlay">
-                <div className="premium-modal">
-                    <h2>Registrar Nuevo Gasto</h2>
-                    <div className="modal-form-grid" style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
-                        <div className="form-group-admin"><label>Concepto</label><input className="premium-input-field" placeholder="Ej: Insumos" value={newExpense.concepto} onChange={(e) => setNewExpense({ ...newExpense, concepto: e.target.value })} /></div>
-                        <div className="form-group-admin"><label>Monto ($)</label><input type="number" className="premium-input-field" value={newExpense.monto} onChange={(e) => setNewExpense({ ...newExpense, monto: e.target.value })} /></div>
-                        <div className="form-group-admin">
-                            <label>Categoría</label>
-                            <CustomSelect
-                                value={newExpense.categoria}
-                                options={['Suministros', 'Servicios', 'Alquiler', 'Marketing', 'Otros']}
-                                onChange={(val) => setNewExpense({ ...newExpense, categoria: val })}
-                            />
+            {selectedAppointment && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal details-modal">
+                        <div className="modal-header-details">
+                            <div className="avatar-large">{selectedAppointment.nombre.charAt(0)}</div>
+                            <h2>Detalles de la Cita</h2>
+                            <span className={`status-pill ${selectedAppointment.status}`}>{selectedAppointment.status}</span>
+                        </div>
+                        <div className="details-grid">
+                            <div className="detail-box"><label>Cliente</label><strong>{selectedAppointment.nombre}</strong></div>
+                            <div className="detail-box"><label>Servicio</label><strong>{selectedAppointment.servicio}</strong></div>
+                            <div className="detail-box"><label>Fecha</label><strong>{selectedAppointment.fecha}</strong></div>
+                            <div className="detail-box"><label>Hora</label><strong>{selectedAppointment.hora}</strong></div>
+                        </div>
+                        <div className="detail-box full"><label>Mensaje / Notas</label><p>{selectedAppointment.mensaje || 'Sin mensaje adicional.'}</p></div>
+                        <div className="modal-actions">
+                            <button className="btn-modal-cancel" onClick={() => setSelectedAppointment(null)}>Cerrar</button>
+                            <button className="btn-primary-admin" onClick={() => { window.open(`https://wa.me/${settings.phone.replace(/[^0-9]/g, '')}`, '_blank'); }}>
+                                <MessageSquare size={18} /> Contactar
+                            </button>
                         </div>
                     </div>
-                    <div className="modal-actions" style={{ marginTop: '2rem' }}>
-                        <button className="btn-modal-cancel" onClick={() => setShowNewExpenseModal(false)}>Cancelar</button>
-                        <button className="btn-primary-admin" onClick={handleCreateExpense}>Guardar</button>
+                </div>
+            )}
+
+            {showDeleteModal && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal">
+                        <div className="modal-icon-warning"><Trash2 size={32} /></div>
+                        <h2>¿Confirmar eliminación?</h2>
+                        <p>Esta acción no se puede deshacer.</p>
+                        <div className="modal-actions">
+                            <button className="btn-modal-cancel" onClick={() => setShowDeleteModal(false)}>Cancelar</button>
+                            <button className="btn-modal-confirm" onClick={confirmDelete}>Sí, Eliminar</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        )}
+            )}
 
-        {showNewServiceModal && (
-            <div className="admin-modal-overlay">
-                <div className="premium-modal details-modal">
-                    <div className="modal-header-details"><h2>Nuevo Servicio</h2></div>
-                    <div className="edit-form">
-                        <div className="form-group-admin"><label>Título</label><input type="text" className="premium-input-field" placeholder="Ej: Masaje de Piedras" value={newService.title} onChange={(e) => setNewService({ ...newService, title: e.target.value })} /></div>
-                        <div className="form-group-admin"><label>Descripción</label><textarea className="premium-input-field" rows="3" value={newService.description} onChange={(e) => setNewService({ ...newService, description: e.target.value })} /></div>
-                        <div className="details-grid" style={{ padding: 0 }}>
-                            <div className="form-group-admin"><label>Precio ($)</label><input type="number" className="premium-input-field" value={newService.price} onChange={(e) => setNewService({ ...newService, price: e.target.value })} /></div>
+            {showEditModal && editingClient && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal details-modal">
+                        <div className="modal-header-details"><h2>Editar Cliente</h2></div>
+                        <div className="edit-form">
+                            <div className="form-group-admin"><label>Nombre</label><input type="text" className="premium-input-field" value={editingClient.nombre} onChange={(e) => setEditingClient({ ...editingClient, nombre: e.target.value })} /></div>
+                            <div className="form-group-admin"><label>Email</label><input type="email" className="premium-input-field" value={editingClient.email} onChange={(e) => setEditingClient({ ...editingClient, email: e.target.value })} /></div>
                             <div className="form-group-admin">
-                                <label>Icono</label>
+                                <label>Categoría</label>
                                 <CustomSelect
-                                    value={newService.icon_name}
-                                    options={['Sparkles', 'Flower2', 'Wind', 'Heart', 'Waves', 'Zap', 'Flame', 'Activity']}
-                                    onChange={(val) => setNewService({ ...newService, icon_name: val })}
+                                    value={editingClient.status}
+                                    options={['Nuevo', 'Frecuente', 'VIP']}
+                                    onChange={(val) => setEditingClient({ ...editingClient, status: val })}
                                 />
                             </div>
                         </div>
-                        <div className="settings-toggle-item small" style={{ marginTop: '1rem' }}>
-                            <div>
-                                <strong>Mostrar Precio en Web</strong>
-                                <p>Si se apaga, el cliente no verá el precio.</p>
-                            </div>
-                            <div className={`premium-switch ${newService.show_price ? 'active' : ''}`} onClick={() => setNewService({ ...newService, show_price: !newService.show_price })}>
-                                <div className="switch-handle"></div>
-                            </div>
+                        <div className="modal-actions">
+                            <button className="btn-modal-cancel" onClick={() => setShowEditModal(false)}>Cancelar</button>
+                            <button className="btn-primary-admin" onClick={saveEditClient}>Guardar</button>
                         </div>
                     </div>
-                    <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
-                        <button className="btn-modal-cancel" onClick={() => setShowNewServiceModal(false)}>Cancelar</button>
-                        <button className="btn-primary-admin" onClick={handleCreateService}>Crear Servicio</button>
+                </div>
+            )}
+
+            {showNewAppModal && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal details-modal">
+                        <div className="modal-header-details"><h2>Nueva Cita</h2></div>
+                        <div className="edit-form">
+                            <div className="form-group-admin"><label>Cliente</label><input type="text" className="premium-input-field" value={newApp.nombre} onChange={(e) => setNewApp({ ...newApp, nombre: e.target.value })} /></div>
+                            <div className="form-group-admin">
+                                <label>Servicio</label>
+                                <CustomSelect
+                                    value={newApp.servicio}
+                                    options={dbServices.length > 0 ? dbServices.map(s => s.title) : ['Masajes', 'Faciales', 'Manicure y Pedicure']}
+                                    onChange={(val) => setNewApp({ ...newApp, servicio: val })}
+                                />
+                            </div>
+                            <div className="details-grid" style={{ padding: 0 }}>
+                                <div className="form-group-admin"><label>Fecha</label><input type="date" className="premium-input-field" value={newApp.fecha} onChange={(e) => setNewApp({ ...newApp, fecha: e.target.value })} /></div>
+                                <div className="form-group-admin"><label>Hora</label><input type="time" className="premium-input-field" value={newApp.hora} onChange={(e) => setNewApp({ ...newApp, hora: e.target.value })} /></div>
+                            </div>
+                        </div>
+                        <div className="modal-actions">
+                            <button className="btn-modal-cancel" onClick={() => setShowNewAppModal(false)}>Cancelar</button>
+                            <button className="btn-primary-admin" onClick={handleCreateAppointment}>Crear</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        )}
+            )}
 
-        {showEditServiceModal && editingService && (
-            <div className="admin-modal-overlay">
-                <div className="premium-modal details-modal">
-                    <div className="modal-header-details"><h2>Editar Servicio</h2></div>
-                    <div className="edit-form">
-                        <div className="form-group-admin"><label>Título</label><input type="text" className="premium-input-field" value={editingService.title} onChange={(e) => setEditingService({ ...editingService, title: e.target.value })} /></div>
-                        <div className="form-group-admin"><label>Descripción</label><textarea className="premium-input-field" rows="3" value={editingService.description} onChange={(e) => setEditingService({ ...editingService, description: e.target.value })} /></div>
-                        <div className="details-grid" style={{ padding: 0 }}>
-                            <div className="form-group-admin"><label>Precio ($)</label><input type="number" className="premium-input-field" value={editingService.price} onChange={(e) => setEditingService({ ...editingService, price: e.target.value })} /></div>
+            {showNewClientModal && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal details-modal">
+                        <div className="modal-header-details"><h2>Nuevo Cliente</h2></div>
+                        <div className="edit-form">
+                            <div className="form-group-admin"><label>Nombre</label><input type="text" className="premium-input-field" value={newClient.nombre} onChange={(e) => setNewClient({ ...newClient, nombre: e.target.value })} /></div>
+                            <div className="form-group-admin"><label>Email</label><input type="email" className="premium-input-field" value={newClient.email} onChange={(e) => setNewClient({ ...newClient, email: e.target.value })} /></div>
+                        </div>
+                        <div className="modal-actions">
+                            <button className="btn-modal-cancel" onClick={() => setShowNewClientModal(false)}>Cancelar</button>
+                            <button className="btn-primary-admin" onClick={handleCreateClient}>Registrar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showNewExpenseModal && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal">
+                        <h2>Registrar Nuevo Gasto</h2>
+                        <div className="modal-form-grid" style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
+                            <div className="form-group-admin"><label>Concepto</label><input className="premium-input-field" placeholder="Ej: Insumos" value={newExpense.concepto} onChange={(e) => setNewExpense({ ...newExpense, concepto: e.target.value })} /></div>
+                            <div className="form-group-admin"><label>Monto ($)</label><input type="number" className="premium-input-field" value={newExpense.monto} onChange={(e) => setNewExpense({ ...newExpense, monto: e.target.value })} /></div>
                             <div className="form-group-admin">
-                                <label>Icono</label>
+                                <label>Categoría</label>
                                 <CustomSelect
-                                    value={editingService.icon_name}
-                                    options={['Sparkles', 'Flower2', 'Wind', 'Heart', 'Waves', 'Zap', 'Flame', 'Activity']}
-                                    onChange={(val) => setEditingService({ ...editingService, icon_name: val })}
+                                    value={newExpense.categoria}
+                                    options={['Suministros', 'Servicios', 'Alquiler', 'Marketing', 'Otros']}
+                                    onChange={(val) => setNewExpense({ ...newExpense, categoria: val })}
                                 />
                             </div>
                         </div>
-                        <div className="settings-toggle-item small" style={{ marginTop: '1rem' }}>
-                            <div>
-                                <strong>Mostrar Precio en Web</strong>
-                                <p>Si se apaga, el cliente no verá el precio.</p>
-                            </div>
-                            <div className={`premium-switch ${editingService.show_price ? 'active' : ''}`} onClick={() => setEditingService({ ...editingService, show_price: !editingService.show_price })}>
-                                <div className="switch-handle"></div>
-                            </div>
+                        <div className="modal-actions" style={{ marginTop: '2rem' }}>
+                            <button className="btn-modal-cancel" onClick={() => setShowNewExpenseModal(false)}>Cancelar</button>
+                            <button className="btn-primary-admin" onClick={handleCreateExpense}>Guardar</button>
                         </div>
                     </div>
-                    <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
-                        <button className="btn-modal-cancel" onClick={() => setShowEditServiceModal(false)}>Cancelar</button>
-                        <button className="btn-primary-admin" onClick={saveEditService}>Guardar Cambios</button>
-                    </div>
                 </div>
-            </div>
-        )}
+            )}
 
-        {selectedClient && (
-            <div className="admin-modal-overlay">
-                <div className="premium-modal client-modal-large">
-                    <div className="client-modal-header">
-                        <div className="avatar-huge">{selectedClient.nombre.charAt(0)}</div>
-                        <div className="client-header-info">
-                            <h2>{selectedClient.nombre}</h2>
-                            <p>{selectedClient.email} • <span className={`status-pill ${selectedClient.status.toLowerCase()}`}>{selectedClient.status}</span></p>
+            {showNewServiceModal && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal details-modal">
+                        <div className="modal-header-details"><h2>Nuevo Servicio</h2></div>
+                        <div className="edit-form">
+                            <div className="form-group-admin"><label>Título</label><input type="text" className="premium-input-field" placeholder="Ej: Masaje de Piedras" value={newService.title} onChange={(e) => setNewService({ ...newService, title: e.target.value })} /></div>
+                            <div className="form-group-admin"><label>Descripción</label><textarea className="premium-input-field" rows="3" value={newService.description} onChange={(e) => setNewService({ ...newService, description: e.target.value })} /></div>
+                            <div className="details-grid" style={{ padding: 0 }}>
+                                <div className="form-group-admin"><label>Precio ($)</label><input type="number" className="premium-input-field" value={newService.price} onChange={(e) => setNewService({ ...newService, price: e.target.value })} /></div>
+                                <div className="form-group-admin">
+                                    <label>Icono</label>
+                                    <CustomSelect
+                                        value={newService.icon_name}
+                                        options={['Sparkles', 'Flower2', 'Wind', 'Heart', 'Waves', 'Zap', 'Flame', 'Activity']}
+                                        onChange={(val) => setNewService({ ...newService, icon_name: val })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="settings-toggle-item small" style={{ marginTop: '1rem' }}>
+                                <div>
+                                    <strong>Mostrar Precio en Web</strong>
+                                    <p>Si se apaga, el cliente no verá el precio.</p>
+                                </div>
+                                <div className={`premium-switch ${newService.show_price ? 'active' : ''}`} onClick={() => setNewService({ ...newService, show_price: !newService.show_price })}>
+                                    <div className="switch-handle"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
+                            <button className="btn-modal-cancel" onClick={() => setShowNewServiceModal(false)}>Cancelar</button>
+                            <button className="btn-primary-admin" onClick={handleCreateService}>Crear Servicio</button>
                         </div>
                     </div>
-                    <div className="client-stats-row">
-                        <div className="mini-stat"><span>Visitas</span><strong>{selectedClient.visitas}</strong></div>
-                        <div className="mini-stat"><span>Total</span><strong>{selectedClient.totalGastado}</strong></div>
-                        <div className="mini-stat"><span>Última</span><strong>{selectedClient.ultimaVisita}</strong></div>
-                    </div>
-                    <div className="modal-actions">
-                        <button className="btn-modal-cancel" onClick={() => setSelectedClient(null)}>Cerrar</button>
-                    </div>
                 </div>
-            </div>
-        )}
+            )}
 
-        {toast.show && (
-            <div className={`premium-toast ${toast.type}`}>
-                <div className="toast-content">
-                    <Check size={18} />
-                    <span>{toast.message}</span>
-                </div>
-            </div>
-        )}
-        {showResetModal && (
-            <div className="admin-modal-overlay">
-                <div className="premium-modal details-modal">
-                    <div className="modal-header-details"><h2>Restablecer Contraseña</h2></div>
-                    <div className="edit-form">
-                        <p style={{ color: '#64748b', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-                            Por favor ingresa tu nueva contraseña maestra para el panel.
-                        </p>
-                        <div className="form-group-admin">
-                            <label>Nueva Contraseña</label>
-                            <input
-                                type="password"
-                                className="premium-input-field"
-                                placeholder="Mínimo 6 caracteres"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                            />
+            {showEditServiceModal && editingService && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal details-modal">
+                        <div className="modal-header-details"><h2>Editar Servicio</h2></div>
+                        <div className="edit-form">
+                            <div className="form-group-admin"><label>Título</label><input type="text" className="premium-input-field" value={editingService.title} onChange={(e) => setEditingService({ ...editingService, title: e.target.value })} /></div>
+                            <div className="form-group-admin"><label>Descripción</label><textarea className="premium-input-field" rows="3" value={editingService.description} onChange={(e) => setEditingService({ ...editingService, description: e.target.value })} /></div>
+                            <div className="details-grid" style={{ padding: 0 }}>
+                                <div className="form-group-admin"><label>Precio ($)</label><input type="number" className="premium-input-field" value={editingService.price} onChange={(e) => setEditingService({ ...editingService, price: e.target.value })} /></div>
+                                <div className="form-group-admin">
+                                    <label>Icono</label>
+                                    <CustomSelect
+                                        value={editingService.icon_name}
+                                        options={['Sparkles', 'Flower2', 'Wind', 'Heart', 'Waves', 'Zap', 'Flame', 'Activity']}
+                                        onChange={(val) => setEditingService({ ...editingService, icon_name: val })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="settings-toggle-item small" style={{ marginTop: '1rem' }}>
+                                <div>
+                                    <strong>Mostrar Precio en Web</strong>
+                                    <p>Si se apaga, el cliente no verá el precio.</p>
+                                </div>
+                                <div className={`premium-switch ${editingService.show_price ? 'active' : ''}`} onClick={() => setEditingService({ ...editingService, show_price: !editingService.show_price })}>
+                                    <div className="switch-handle"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="form-group-admin">
-                            <label>Confirmar Contraseña</label>
-                            <input
-                                type="password"
-                                className="premium-input-field"
-                                placeholder="Repite la contraseña"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                            />
+                        <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
+                            <button className="btn-modal-cancel" onClick={() => setShowEditServiceModal(false)}>Cancelar</button>
+                            <button className="btn-primary-admin" onClick={saveEditService}>Guardar Cambios</button>
                         </div>
                     </div>
-                    <div className="modal-actions" style={{ marginTop: '2rem' }}>
-                        <button className="btn-primary-admin" style={{ width: '100%', justifyContent: 'center' }} onClick={handleUpdatePassword}>
-                            <Shield size={18} /> Actualizar Contraseña y Entrar
-                        </button>
+                </div>
+            )}
+
+            {selectedClient && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal client-modal-large">
+                        <div className="client-modal-header">
+                            <div className="avatar-huge">{selectedClient.nombre.charAt(0)}</div>
+                            <div className="client-header-info">
+                                <h2>{selectedClient.nombre}</h2>
+                                <p>{selectedClient.email} • <span className={`status-pill ${selectedClient.status.toLowerCase()}`}>{selectedClient.status}</span></p>
+                            </div>
+                        </div>
+                        <div className="client-stats-row">
+                            <div className="mini-stat"><span>Visitas</span><strong>{selectedClient.visitas}</strong></div>
+                            <div className="mini-stat"><span>Total</span><strong>{selectedClient.totalGastado}</strong></div>
+                            <div className="mini-stat"><span>Última</span><strong>{selectedClient.ultimaVisita}</strong></div>
+                        </div>
+                        <div className="modal-actions">
+                            <button className="btn-modal-cancel" onClick={() => setSelectedClient(null)}>Cerrar</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        )}
-    </div>
-);
+            )}
+
+            {toast.show && (
+                <div className={`premium-toast ${toast.type}`}>
+                    <div className="toast-content">
+                        <Check size={18} />
+                        <span>{toast.message}</span>
+                    </div>
+                </div>
+            )}
+            {showResetModal && (
+                <div className="admin-modal-overlay">
+                    <div className="premium-modal details-modal">
+                        <div className="modal-header-details"><h2>Restablecer Contraseña</h2></div>
+                        <div className="edit-form">
+                            <p style={{ color: '#64748b', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                                Por favor ingresa tu nueva contraseña maestra para el panel.
+                            </p>
+                            <div className="form-group-admin">
+                                <label>Nueva Contraseña</label>
+                                <input
+                                    type="password"
+                                    className="premium-input-field"
+                                    placeholder="Mínimo 6 caracteres"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                />
+                            </div>
+                            <div className="form-group-admin">
+                                <label>Confirmar Contraseña</label>
+                                <input
+                                    type="password"
+                                    className="premium-input-field"
+                                    placeholder="Repite la contraseña"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-actions" style={{ marginTop: '2rem' }}>
+                            <button className="btn-primary-admin" style={{ width: '100%', justifyContent: 'center' }} onClick={handleUpdatePassword}>
+                                <Shield size={18} /> Actualizar Contraseña y Entrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 };
 
 export default AdminDashboard;
