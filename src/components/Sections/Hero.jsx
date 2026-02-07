@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import './Hero.css';
 
-const Hero = () => {
+const Hero = ({ spaSettings }) => {
     return (
         <section id="inicio" className="hero">
             <div className="hero-overflow">
@@ -21,7 +21,7 @@ const Hero = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, delay: 0.5 }}
                 >
-                    <span className="hero-subtitle">Venus Elegant Spa</span>
+                    <span className="hero-subtitle">{spaSettings?.spaName || 'Venus Elegant Spa'}</span>
                     <h1 className="hero-title">
                         Vive la <br />
                         <span>Experiencia</span>

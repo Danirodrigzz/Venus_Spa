@@ -1,14 +1,14 @@
 import React from 'react';
-import { Instagram, Facebook, Mail, MapPin, Phone } from 'lucide-react';
+import { Instagram, Facebook, MapPin, Phone } from 'lucide-react';
 import './Footer.css';
 
-const Footer = () => {
+const Footer = ({ spaSettings }) => {
     return (
         <footer className="footer">
             <div className="container">
                 <div className="footer-grid">
                     <div className="footer-brand">
-                        <h2>VENUS</h2>
+                        <h2>{spaSettings?.spaName?.toUpperCase() || 'VENUS'}</h2>
                         <p>Elegancia y relajación en cada detalle. Tu escape perfecto en Santo Domingo.</p>
                         <div className="footer-social">
                             <a href="https://www.facebook.com/share/1EYpX7UvDV/" target="_blank" rel="noreferrer"><Facebook size={20} /></a>
@@ -29,9 +29,9 @@ const Footer = () => {
                     <div className="footer-contact">
                         <h3>Contacto</h3>
                         <ul>
-                            <li><MapPin size={18} /> Plaza Rubi Av. España #69, 3er nivel, local 303, Santo Domingo Este</li>
-                            <li><Phone size={18} /> +1 (849) 316-4217</li>
-                            <li><Mail size={18} /> venuselegantspa@gmail.com</li>
+                            <li><MapPin size={18} /> {spaSettings?.address}</li>
+                            <li><Phone size={18} /> {spaSettings?.phone}</li>
+
                         </ul>
                     </div>
                 </div>

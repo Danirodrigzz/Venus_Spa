@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Flower2, Wind, Heart, Waves, Zap, Flame, Activity } from 'lucide-react';
+import { Sparkle, Flower2, Wind, Heart, Waves, Zap, Flame, Activity } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import './Services.css';
 
@@ -10,7 +10,7 @@ const IconMap = {
     'Zap': <Zap size={32} />,
     'Activity': <Activity size={32} />,
     'Waves': <Waves size={32} />,
-    'Sparkles': <Sparkles size={32} />,
+    'Sparkle': <Sparkle size={32} />,
     'Heart': <Heart size={32} />,
     'Wind': <Wind size={32} />,
 };
@@ -21,10 +21,10 @@ const defaultServices = [
     { icon: 'Zap', title: "Masaje Reconstructor", description: "Ideal para dolores musculares profundos." },
     { icon: 'Activity', title: "Masaje Deportivo", description: "Mejora del rendimiento físico." },
     { icon: 'Waves', title: "Choco-Love", description: "Terapia sensorial con chocolate." },
-    { icon: 'Sparkles', title: "Limpieza Facial", description: "Elimina impurezas y devuelve el brillo." },
+    { icon: 'Sparkle', title: "Limpieza Facial", description: "Elimina impurezas y devuelve el brillo." },
     { icon: 'Heart', title: "Exfoliación", description: "Remoción de células muertas." },
     { icon: 'Wind', title: "Masaje 4 Manos", description: "Doble técnica y relajación simultánea." },
-    { icon: 'Sparkles', title: "Manicure y Pedicure", description: "Cuidado integral para manos y pies." }
+    { icon: 'Sparkle', title: "Manicure y Pedicure", description: "Cuidado integral para manos y pies." }
 ];
 
 const Services = () => {
@@ -33,6 +33,18 @@ const Services = () => {
 
     useEffect(() => {
         fetchServices();
+
+        // Realtime subscription for context updates
+        const servicesSubscription = supabase
+            .channel('services-realtime')
+            .on('postgres_changes', { event: '*', table: 'services' }, () => {
+                fetchServices();
+            })
+            .subscribe();
+
+        return () => {
+            servicesSubscription.unsubscribe();
+        };
     }, []);
 
     const fetchServices = async () => {
@@ -76,7 +88,7 @@ const Services = () => {
                             viewport={{ once: true }}
                         >
                             <div className="service-icon">
-                                {IconMap[service.icon_name] || IconMap[service.icon] || <Sparkles size={32} />}
+                                {IconMap[service.icon_name] || IconMap[service.icon] || <Sparkle size={32} />}
                             </div>
                             <h3>{service.title}</h3>
                             <p>{service.description}</p>

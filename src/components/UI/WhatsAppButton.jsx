@@ -2,10 +2,12 @@ import React from 'react';
 import { IconBrandWhatsapp } from '@tabler/icons-react';
 import './WhatsAppButton.css';
 
-const WhatsAppButton = () => {
+const WhatsAppButton = ({ spaSettings }) => {
+    const cleanPhone = spaSettings?.phone?.replace(/[^0-9]/g, '') || '04241145565';
+
     return (
         <a
-            href="https://wa.me/04241145565"
+            href={`https://wa.me/${cleanPhone}`}
             className="whatsapp-float"
             target="_blank"
             rel="noopener noreferrer"

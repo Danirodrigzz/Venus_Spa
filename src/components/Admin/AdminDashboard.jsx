@@ -4,13 +4,11 @@ import {
     PieChart, Pie, Cell, AreaChart, Area
 } from 'recharts';
 import {
-    Users, Calendar, CheckCircle, XCircle, Clock,
-    TrendingUp, Activity, Search, LayoutDashboard,
-    Settings, LogOut, Bell, MoreVertical,
-    Plus, Filter, Download, UserPlus, MessageSquare,
-    Mail, Edit2, Trash2, ExternalLink, ChevronDown,
-    Menu, X, FileText, Wallet, Receipt, Shield,
-    Globe, Lock, User, Phone, MapPin, Check, Sparkles
+    Users, Calendar, CheckCircle, XCircle, Clock, TrendingUp, Activity, Search, LayoutDashboard,
+    Settings, LogOut, Bell, MoreVertical, Plus, Filter, Download, UserPlus, MessageSquare,
+    Mail, Edit2, Trash2, ExternalLink, ChevronDown, ChevronLeft, ChevronRight, Menu, X, FileText, Wallet, Receipt, Shield,
+    Globe, Lock, User, Phone, MapPin, Check, DollarSign, Save, Type, AlignLeft, Sparkle, Eye,
+    Flower2, Wind, Heart, Waves, Zap, Flame
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import jsPDF from 'jspdf';
@@ -18,6 +16,17 @@ import autoTable from 'jspdf-autotable';
 import './AdminDashboard.css';
 
 const COLORS = ['#AC6D39', '#C58B5F', '#DBC7BB', '#4A3E37', '#7A6F68'];
+
+const AdminIconMap = {
+    'Flower2': <Flower2 size={16} />,
+    'Flame': <Flame size={16} />,
+    'Zap': <Zap size={16} />,
+    'Activity': <Activity size={16} />,
+    'Waves': <Waves size={16} />,
+    'Sparkle': <Sparkle size={16} />,
+    'Heart': <Heart size={16} />,
+    'Wind': <Wind size={16} />,
+};
 
 const CustomSelect = ({ value, options, onChange, placeholder = "Seleccionar", width = "100%" }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -33,14 +42,23 @@ const CustomSelect = ({ value, options, onChange, placeholder = "Seleccionar", w
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    const renderOption = (val) => {
+        const icon = AdminIconMap[val];
+        return (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {icon && <span style={{ display: 'flex', alignItems: 'center', opacity: 0.8 }}>{icon}</span>}
+                <span>{val}</span>
+            </div>
+        );
+    };
+
     return (
         <div className="custom-select-wrapper" ref={ref} style={{ width }}>
             <div
                 className="custom-select-trigger"
                 onClick={() => setIsOpen(!isOpen)}
-                style={{ justifyContent: 'space-between' }}
             >
-                <span>{value || placeholder}</span>
+                {renderOption(value || placeholder)}
                 <ChevronDown size={16} className={`chevron ${isOpen ? 'rotate' : ''}`} />
             </div>
             {isOpen && (
@@ -54,7 +72,7 @@ const CustomSelect = ({ value, options, onChange, placeholder = "Seleccionar", w
                                 setIsOpen(false);
                             }}
                         >
-                            {option}
+                            {renderOption(option)}
                         </div>
                     ))}
                 </div>
@@ -82,7 +100,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     const [showNewAppModal, setShowNewAppModal] = useState(false);
     const [showNewClientModal, setShowNewClientModal] = useState(false);
     const [newApp, setNewApp] = useState({ nombre: '', servicio: '', fecha: '', hora: '', mensaje: '' });
-    const [newClient, setNewClient] = useState({ nombre: '', email: '', status: 'Nuevo' });
+    const [newClient, setNewClient] = useState({ nombre: '', status: 'Nuevo' });
     const [openFilter, setOpenFilter] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [chartPeriod, setChartPeriod] = useState('Últimos 7 días');
@@ -106,14 +124,14 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     const [showNewServiceModal, setShowNewServiceModal] = useState(false);
     const [showEditServiceModal, setShowEditServiceModal] = useState(false);
     const [editingService, setEditingService] = useState(null);
-    const [newService, setNewService] = useState({ title: '', description: '', price: 0, icon_name: 'Sparkles', show_price: true });
+    const [newService, setNewService] = useState({ title: '', description: '', price: 0, icon_name: 'Sparkle', show_price: true });
     const [newExpense, setNewExpense] = useState({ concepto: '', categoria: 'Suministros', monto: '', fecha: new Date().toISOString().split('T')[0] });
     const [showNotifications, setShowNotifications] = useState(false);
     const [activeSettingsSection, setActiveSettingsSection] = useState('general');
     const [settings, setSettings] = useState({
         spaName: 'Venus Elegant Spa',
         phone: '04241145565',
-        email: 'contacto@venuselegantspa.com',
+
         address: 'Calle Primavera #45, Santo Domingo',
         openingHour: '09:00',
         closingHour: '19:00',
@@ -121,6 +139,12 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
         currency: 'USD',
         notificationsEnabled: true,
         autoApprove: false
+    });
+    const [currentWeekStart, setCurrentWeekStart] = useState(() => {
+        const d = new Date();
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
+        return new Date(d.setDate(diff)).toISOString().split('T')[0];
     });
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
     const notificationRef = useRef(null);
@@ -217,7 +241,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                     clientsMap[app.nombre] = {
                         id: app.nombre,
                         nombre: app.nombre,
-                        email: '-',
+
                         visitas: 0,
                         totalGastado: '$0',
                         ultimaVisita: app.fecha,
@@ -265,12 +289,40 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
         }
     };
 
-    const fetchNotifications = async () => {
-        // Simulado por ahora o fetch de una tabla
-        setNotifications([
-            { id: 1, text: 'Bienvenido al panel Venus Spa', time: 'Sistema', unread: true }
-        ]);
+    const fetchNotifications = () => {
+        const alerts = [];
+
+        // Citas pendientes
+        const pendingCount = appointments.filter(a => a.status === 'pending' || a.status === 'pendiendo').length;
+        if (pendingCount > 0) {
+            alerts.push({
+                id: 'pending-alert',
+                text: `Tienes ${pendingCount} cita(s) pendiente(s) de aprobar.`,
+                time: 'Hace un momento',
+                unread: true
+            });
+        }
+
+        // Gastos altos recientes (simulado lógica simple)
+        if (expenses.length > 0 && expenses[0].date === new Date().toISOString().split('T')[0]) {
+            alerts.push({
+                id: 'new-expense',
+                text: `Se registró un nuevo gasto hoy: ${expenses[0].concepto}`,
+                time: 'Hoy',
+                unread: true
+            });
+        }
+
+        if (alerts.length === 0) {
+            alerts.push({ id: 1, text: 'Todo al día. No hay nuevas alertas.', time: 'Ahora', unread: false });
+        }
+
+        setNotifications(alerts);
     };
+
+    useEffect(() => {
+        fetchNotifications();
+    }, [appointments, expenses]); // Recalcular notificaciones si cambian citas o gastos
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -300,8 +352,8 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
         setActiveMenu(activeMenu === id ? null : id);
     };
 
-    const handleDeleteClick = (id, type) => {
-        setItemToDelete({ id, type });
+    const handleDeleteClick = (id, type, message = 'Esta acción no se puede deshacer.') => {
+        setItemToDelete({ id, type, message });
         setShowDeleteModal(true);
         setActiveMenu(null);
     };
@@ -309,21 +361,29 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     const confirmDelete = async () => {
         if (!itemToDelete) return;
         try {
-            const table = itemToDelete.type === 'appointment' ? 'appointments' : 'clients';
-            // Nota: En este esquema simplificado, los clientes se derivan de las citas, 
-            // así que borrar un cliente significaría borrar todas sus citas.
-            const { error } = await supabase
-                .from(table === 'appointments' ? 'appointments' : 'appointments')
-                .delete()
-                .eq(table === 'appointments' ? 'id' : 'client_name', itemToDelete.id);
+            let error;
+            if (itemToDelete.type === 'appointment') {
+                const res = await supabase.from('appointments').delete().eq('id', itemToDelete.id);
+                error = res.error;
+                if (!error) setAppointments(appointments.filter(app => app.id !== itemToDelete.id));
+            } else if (itemToDelete.type === 'client') {
+                const res = await supabase.from('appointments').delete().eq('client_name', itemToDelete.id);
+                error = res.error;
+                if (!error) {
+                    setAppointments(appointments.filter(app => app.nombre !== itemToDelete.id));
+                    setClientList(clientList.filter(client => client.id !== itemToDelete.id));
+                }
+            } else if (itemToDelete.type === 'expense') {
+                const res = await supabase.from('expenses').delete().eq('id', itemToDelete.id);
+                error = res.error;
+                if (!error) setExpenses(expenses.filter(e => e.id !== itemToDelete.id));
+            } else if (itemToDelete.type === 'service') {
+                const res = await supabase.from('services').delete().eq('id', itemToDelete.id);
+                error = res.error;
+                if (!error) setDbServices(dbServices.filter(s => s.id !== itemToDelete.id));
+            }
 
             if (error) throw error;
-
-            if (itemToDelete.type === 'appointment') {
-                setAppointments(appointments.filter(app => app.id !== itemToDelete.id));
-            } else {
-                setAppointments(appointments.filter(app => app.nombre !== itemToDelete.id));
-            }
             showToast('Eliminado correctamente');
         } catch (error) {
             console.error('Error deleting:', error);
@@ -359,7 +419,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                     date: newApp.fecha,
                     time: newApp.hora,
                     message: newApp.mensaje,
-                    status: 'pendiendo'
+                    status: 'pending'
                 }])
                 .select();
 
@@ -385,7 +445,8 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
             ultimaVisita: 'N/A'
         }]);
         setShowNewClientModal(false);
-        setNewClient({ nombre: '', email: '', status: 'Nuevo' });
+        setNewClient({ nombre: '', status: 'Nuevo' });
+        showToast('Cliente registrado con éxito');
     };
 
     const handleFilterSelect = (type, value) => {
@@ -421,7 +482,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                     id: 1,
                     spa_name: settings.spaName,
                     phone: settings.phone,
-                    email: settings.email,
+
                     address: settings.address,
                     opening_hour: settings.openingHour,
                     closing_hour: settings.closingHour,
@@ -478,7 +539,6 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
 
         const clientRows = clientList.map(c => [
             c.nombre,
-            c.email,
             c.visitas,
             c.totalGastado,
             c.status
@@ -486,7 +546,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
 
         autoTable(doc, {
             startY: finalY + 5,
-            head: [['Nombre', 'Email', 'Visitas', 'Gasto Total', 'Categoría']],
+            head: [['Nombre', 'Visitas', 'Gasto Total', 'Categoría']],
             body: clientRows,
             theme: 'striped',
             headStyles: { fillColor: [172, 109, 57] },
@@ -505,10 +565,20 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     };
 
     const getTimeStats = () => {
-        return [
-            { name: 'Lun', citas: 4 }, { name: 'Mar', citas: 7 }, { name: 'Mie', citas: 5 },
-            { name: 'Jue', citas: 8 }, { name: 'Vie', citas: 12 }, { name: 'Sab', citas: 15 }, { name: 'Dom', citas: 6 },
-        ];
+        const days = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
+        const stats = days.map(day => ({ name: day, citas: 0 }));
+
+        appointments.forEach(app => {
+            const date = new Date(app.fecha);
+            // Ajustar zona horaria si es necesario, pero new Date(string) suele funcionar bien para fechas YYYY-MM-DD
+            // Nota: getDay() devuelve 0 para Domingo, 1 Lunes...
+            if (!isNaN(date.getTime())) {
+                stats[date.getDay()].citas += 1;
+            }
+        });
+
+        // Reordenar para empezar en Lunes si se prefiere, o dejar Domingo primero
+        return [...stats.slice(1), stats[0]]; // Lun a Dom
     };
 
     const filteredAppointments = appointments.filter(app => {
@@ -564,12 +634,33 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                 </div>
                 <div className="premium-stat-card">
                     <div className="stat-header">
+                        <div className="icon-box red"><XCircle size={24} /></div>
+                        <span className="trend neutral">-</span>
+                    </div>
+                    <div className="stat-body">
+                        <h3>Rechazadas</h3>
+                        <h2>{stats.rejected}</h2>
+                    </div>
+                </div>
+                <div className="premium-stat-card">
+                    <div className="stat-header">
                         <div className="icon-box rose"><TrendingUp size={24} /></div>
                         <span className="trend positive">+18%</span>
                     </div>
                     <div className="stat-body">
-                        <h3>Ingresos Est.</h3>
-                        <h2>{stats.revenue}</h2>
+                        <h3>Ingresos Potenciales</h3>
+                        <h2>{stats.potential_revenue}</h2>
+                        <span className="trend positive">Solo citas aprobadas</span>
+                    </div>
+                </div>
+                <div className="premium-stat-card">
+                    <div className="stat-header">
+                        <div className="icon-box green"><Wallet size={24} /></div>
+                        <span className="trend positive">En Caja</span>
+                    </div>
+                    <div className="stat-body">
+                        <h3>Ingresos Reales</h3>
+                        <h2>{stats.real_revenue}</h2>
                     </div>
                 </div>
             </div>
@@ -665,9 +756,19 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                 <div className="header-btns">
                     <div className="filter-dropdown-container">
                         <CustomSelect
-                            value={appointmentFilter === 'all' ? 'Todas las Citas' : appointmentFilter.charAt(0).toUpperCase() + appointmentFilter.slice(1)}
-                            options={['all', 'aprobada', 'pendiendo', 'rechazada'].map(o => o === 'all' ? 'Todas las Citas' : o.charAt(0).toUpperCase() + o.slice(1))}
-                            onChange={(val) => handleFilterSelect('appointment', val === 'Todas las Citas' ? 'all' : val.toLowerCase())}
+                            value={appointmentFilter === 'all' ? 'Todas las Citas' :
+                                appointmentFilter === 'pending' ? 'Pendiente' :
+                                    appointmentFilter === 'aprobada' ? 'Aprobada' :
+                                        appointmentFilter === 'completada' ? 'Completada' :
+                                            appointmentFilter === 'rechazada' ? 'Rechazada' :
+                                                appointmentFilter.charAt(0).toUpperCase() + appointmentFilter.slice(1)}
+                            options={['Todas las Citas', 'Aprobada', 'Pendiente', 'Completada', 'Rechazada']}
+                            onChange={(val) => handleFilterSelect('appointment',
+                                val === 'Todas las Citas' ? 'all' :
+                                    val === 'Pendiente' ? 'pending' :
+                                        val === 'Aprobada' ? 'aprobada' :
+                                            val === 'Completada' ? 'completada' :
+                                                val === 'Rechazada' ? 'rechazada' : val.toLowerCase())}
                             width="200px"
                         />
                     </div>
@@ -684,6 +785,12 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                         <Search size={16} />
                         <input type="text" placeholder="Buscar citas..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                     </div>
+                </div>
+
+                <div className="action-legend" style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #e2e8f0' }}>
+                    <div className="legend-item"><CheckCircle size={16} /> Aprobar</div>
+                    <div className="legend-item"><Wallet size={16} /> Finalizar y Cobrar</div>
+                    <div className="legend-item"><XCircle size={16} /> Rechazar</div>
                 </div>
                 <div className="table-wrapper">
                     <table className="premium-table">
@@ -717,27 +824,35 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                     </td>
                                     <td data-label="Estado">
                                         <span className={`status-pill ${app.status}`}>
-                                            {app.status === 'pendiendo' ? 'Pendiente' : app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                                            {(app.status === 'pending' || app.status === 'pendiendo') ? 'Pendiente' :
+                                                app.status === 'completada' ? 'Completada' :
+                                                    app.status === 'aprobada' ? 'Aprobada' :
+                                                        app.status === 'rechazada' ? 'Rechazada' :
+                                                            app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                                         </span>
                                     </td>
                                     <td data-label="Acciones">
                                         <div className="action-row">
-                                            <button onClick={() => updateStatus(app.id, 'aprobada')} className="action-btn approve" title="Aprobar">
-                                                <CheckCircle size={18} />
-                                                <span className="mobile-label">Aprobar</span>
-                                            </button>
-                                            <button onClick={() => updateStatus(app.id, 'rechazada')} className="action-btn reject" title="Rechazar">
+                                            {app.status !== 'completada' && (
+                                                <>
+                                                    <button onClick={() => updateStatus(app.id, 'aprobada')} className="action-btn approve" data-tooltip="Aprobar Cita">
+                                                        <CheckCircle size={18} />
+                                                    </button>
+                                                    <button onClick={() => updateStatus(app.id, 'completada')} className="action-btn complete" data-tooltip="Finalizar y Cobrar" style={{ color: '#0369a1', background: '#e0f2fe' }}>
+                                                        <Wallet size={18} />
+                                                    </button>
+                                                </>
+                                            )}
+                                            <button onClick={() => updateStatus(app.id, 'rechazada')} className="action-btn reject" data-tooltip="Rechazar Cita">
                                                 <XCircle size={18} />
-                                                <span className="mobile-label">Rechazar</span>
                                             </button>
                                             <div className="more-menu-container">
                                                 <button
                                                     className={`action-btn more ${activeMenu === app.id ? 'active' : ''}`}
                                                     onClick={() => toggleMenu(app.id)}
-                                                    title="Más acciones"
+                                                    data-tooltip="Más Opciones"
                                                 >
                                                     <MoreVertical size={18} />
-                                                    <span className="mobile-label">Más</span>
                                                 </button>
 
                                                 {activeMenu === app.id && (
@@ -747,6 +862,9 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                                         </button>
                                                         <button className="dropdown-item whatsapp" onClick={() => { window.open(`https://wa.me/18493164217`, '_blank'); setActiveMenu(null); }}>
                                                             <MessageSquare size={14} /> WhatsApp
+                                                        </button>
+                                                        <button className="dropdown-item" onClick={() => { updateStatus(app.id, 'pending'); setActiveMenu(null); }}>
+                                                            <Clock size={14} /> Marcar como Pendiente
                                                         </button>
                                                         <div className="dropdown-divider"></div>
                                                         <button className="dropdown-item delete" onClick={() => handleDeleteClick(app.id, 'appointment')}>
@@ -769,8 +887,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     // Otros renders (Clients, Reports, Settings) - simplificados por espacio
     const renderClients = () => {
         const filteredClients = clientList.filter(client => {
-            const matchesSearch = client.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                client.email.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesSearch = client.nombre.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesFilter = clientFilter === 'all' || client.status === clientFilter;
             return matchesSearch && matchesFilter;
         });
@@ -783,7 +900,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                         <strong>{client.nombre}</strong>
                     </div>
                 </td>
-                <td data-label="Email"><span className="text-muted">{client.email}</span></td>
+
                 <td data-label="Visitas"><strong>{client.visitas}</strong></td>
                 <td data-label="Total Gastado"><span className="revenue-text">{client.totalGastado}</span></td>
                 <td data-label="Última Visita">{client.ultimaVisita}</td>
@@ -816,9 +933,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                     <button className="dropdown-item whatsapp" onClick={() => { window.open(`https://wa.me/18493164217`, '_blank'); setActiveMenu(null); }}>
                                         <MessageSquare size={14} /> WhatsApp
                                     </button>
-                                    <button className="dropdown-item" onClick={() => { window.open(`mailto:${client.email}`, '_blank'); setActiveMenu(null); }}>
-                                        <Mail size={14} /> Enviar Email
-                                    </button>
+
                                     <div className="dropdown-divider"></div>
                                     <button className="dropdown-item delete" onClick={() => handleDeleteClick(client.id, 'client')}>
                                         <Trash2 size={14} /> Eliminar
@@ -881,7 +996,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                             <Search size={16} />
                             <input
                                 type="text"
-                                placeholder="Buscar por nombre o email..."
+                                placeholder="Buscar por nombre..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -892,7 +1007,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                             <thead>
                                 <tr>
                                     <th>Cliente</th>
-                                    <th>Email</th>
+
                                     <th>Visitas</th>
                                     <th>Total Gastado</th>
                                     <th>Última Visita</th>
@@ -904,7 +1019,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                 {filteredClients.map(renderClientRow)}
                                 {filteredClients.length === 0 && (
                                     <tr>
-                                        <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>No se encontraron clientes.</td>
+                                        <td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>No se encontraron clientes.</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -945,21 +1060,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     };
 
     const handleDeleteExpense = async (id) => {
-        if (!window.confirm('¿Estás seguro de eliminar este gasto?')) return;
-        try {
-            const { error } = await supabase
-                .from('expenses')
-                .delete()
-                .eq('id', id);
-
-            if (error) throw error;
-
-            setExpenses(expenses.filter(e => e.id !== id));
-            showToast('Gasto eliminado');
-        } catch (error) {
-            console.error('Error deleting expense:', error);
-            showToast('Error al eliminar gasto', 'error');
-        }
+        handleDeleteClick(id, 'expense', '¿Estás seguro de eliminar este gasto? No se podrá recuperar.');
     };
 
     const handleCreateExpense = async () => {
@@ -1024,21 +1125,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     };
 
     const handleDeleteService = async (id) => {
-        if (!window.confirm('¿Estás seguro de eliminar este servicio? Esto puede afectar a los reportes de citas pasadas.')) return;
-        try {
-            const { error } = await supabase
-                .from('services')
-                .delete()
-                .eq('id', id);
-
-            if (error) throw error;
-
-            setDbServices(dbServices.filter(s => s.id !== id));
-            showToast('Servicio eliminado');
-        } catch (error) {
-            console.error('Error deleting service:', error);
-            showToast('Error al eliminar servicio', 'error');
-        }
+        handleDeleteClick(id, 'service', '¿Estás seguro de eliminar este servicio? Esto puede afectar a los reportes de citas pasadas.');
     };
 
     const handleCreateService = async () => {
@@ -1057,7 +1144,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
 
             await fetchServicesList();
             setShowNewServiceModal(false);
-            setNewService({ title: '', description: '', price: 0, icon_name: 'Sparkles', show_price: true });
+            setNewService({ title: '', description: '', price: 0, icon_name: 'Sparkle', show_price: true });
             showToast('Nuevo servicio creado');
         } catch (error) {
             console.error('Error creating service:', error);
@@ -1094,8 +1181,8 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                 <tr key={service.id}>
                                     <td data-label="Servicio">
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <div className="icon-box-small" style={{ background: 'rgba(172, 109, 57, 0.1)', color: '#AC6D39', padding: '8px', borderRadius: '8px' }}>
-                                                <Sparkles size={16} />
+                                            <div className="icon-box-small" style={{ background: 'rgba(172, 109, 57, 0.1)', color: '#AC6D39', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                {AdminIconMap[service.icon_name] || AdminIconMap[service.icon] || <Sparkle size={16} />}
                                             </div>
                                             <strong>{service.title}</strong>
                                         </div>
@@ -1142,13 +1229,15 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
             });
         }
 
-        // Sumar ingresos de citas aprobadas
-        appointments.filter(a => a.status === 'aprobada').forEach(app => {
+        // Sumar ingresos de citas aprobadas (y completadas)
+        appointments.filter(a => a.status === 'aprobada' || a.status === 'completada').forEach(app => {
             const appDate = new Date(app.fecha);
             const appMonth = appDate.getMonth();
             const dataPoint = last6Months.find(d => d.monthIdx === appMonth);
             if (dataPoint) {
-                const service = dbServices.find(s => s.title === app.servicio);
+                const service = dbServices.find(s =>
+                    s.title?.trim().toLowerCase() === app.servicio?.trim().toLowerCase()
+                );
                 dataPoint.ingresos += (service?.price || 0);
             }
         });
@@ -1250,6 +1339,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                 <label>Concepto</label>
                                 <input
                                     className="premium-input-field"
+                                    placeholder="Concepto del gasto"
                                     value={editingExpense.concepto}
                                     onChange={(e) => setEditingExpense({ ...editingExpense, concepto: e.target.value })}
                                 />
@@ -1259,6 +1349,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                 <input
                                     type="number"
                                     className="premium-input-field"
+                                    placeholder="0.00"
                                     value={editingExpense.monto}
                                     onChange={(e) => setEditingExpense({ ...editingExpense, monto: parseFloat(e.target.value) })}
                                 />
@@ -1312,7 +1403,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                     <div className="stat-body">
                         <label>Ingresos Totales</label>
                         <h2>{stats.revenue}</h2>
-                        <span className="trend positive">Basado en citas aprobadas</span>
+                        <span className="trend positive">Finalizadas y cobradas</span>
                     </div>
                 </div>
                 <div className="premium-stat-card">
@@ -1325,14 +1416,14 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                 <div className="premium-stat-card">
                     <div className="stat-body">
                         <label>Promedio por Cliente</label>
-                        <h2>$85.50</h2>
+                        <h2>{stats.avg_per_client}</h2>
                         <span className="trend positive">Ticket saludable</span>
                     </div>
                 </div>
                 <div className="premium-stat-card">
                     <div className="stat-body">
                         <label>Fidelidad de Clientes</label>
-                        <h2>78%</h2>
+                        <h2>{stats.client_loyalty}</h2>
                         <span className="trend positive">Vuelven pronto</span>
                     </div>
                 </div>
@@ -1411,16 +1502,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                             <span>Identidad y contacto</span>
                         </div>
                     </button>
-                    <button
-                        className={`settings-nav-btn ${activeSettingsSection === 'horario' ? 'active' : ''}`}
-                        onClick={() => setActiveSettingsSection('horario')}
-                    >
-                        <Clock size={18} />
-                        <div className="nav-btn-text">
-                            <strong>Horario</strong>
-                            <span>Apertura y cierre</span>
-                        </div>
-                    </button>
+
                     <button
                         className={`settings-nav-btn ${activeSettingsSection === 'notificaciones' ? 'active' : ''}`}
                         onClick={() => setActiveSettingsSection('notificaciones')}
@@ -1464,18 +1546,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="form-group-admin">
-                                        <label>Correo Electrónico</label>
-                                        <div className="input-with-icon-premium">
-                                            <Mail size={18} />
-                                            <input
-                                                type="email"
-                                                className="premium-input-field"
-                                                value={settings.email}
-                                                onChange={(e) => setSettings({ ...settings, email: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
+
                                     <div className="form-group-admin">
                                         <label>Teléfono de Contacto</label>
                                         <div className="input-with-icon-premium">
@@ -1490,11 +1561,9 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                     </div>
                                     <div className="form-group-admin">
                                         <label>Moneda del Sistema</label>
-                                        <CustomSelect
-                                            value={settings.currency}
-                                            options={['USD', 'DOP', 'VES', 'EUR']}
-                                            onChange={(val) => setSettings({ ...settings, currency: val })}
-                                        />
+                                        <div className="premium-input-field disabled-field" style={{ background: '#f1f5f9', color: '#64748b', cursor: 'not-allowed' }}>
+                                            USD (Dólares Estadounidenses)
+                                        </div>
                                     </div>
                                     <div className="form-group-admin full-width-admin">
                                         <label>Dirección Física</label>
@@ -1513,50 +1582,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                         </div>
                     )}
 
-                    {activeSettingsSection === 'horario' && (
-                        <div className="settings-card single-card">
-                            <div className="card-header-premium">
-                                <Clock size={20} />
-                                <h3>Horarios de Operación</h3>
-                            </div>
-                            <div className="card-body-premium">
-                                <div className="settings-grid">
-                                    <div className="form-group-admin">
-                                        <label>Apertura</label>
-                                        <div className="input-with-icon-premium">
-                                            <Clock size={18} />
-                                            <input
-                                                type="time"
-                                                className="premium-input-field"
-                                                value={settings.openingHour}
-                                                onChange={(e) => setSettings({ ...settings, openingHour: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-group-admin">
-                                        <label>Cierre</label>
-                                        <div className="input-with-icon-premium">
-                                            <Clock size={18} />
-                                            <input
-                                                type="time"
-                                                className="premium-input-field"
-                                                value={settings.closingHour}
-                                                onChange={(e) => setSettings({ ...settings, closingHour: e.target.value })}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="form-group-admin">
-                                        <label>Intervalo entre Citas</label>
-                                        <CustomSelect
-                                            value={settings.appointmentsInterval}
-                                            options={['30 min', '45 min', '60 min', '90 min', '120 min']}
-                                            onChange={(val) => setSettings({ ...settings, appointmentsInterval: val })}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+
 
                     {activeSettingsSection === 'notificaciones' && (
                         <div className="settings-card single-card">
@@ -1565,15 +1591,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                 <h3>Preferencias de Alerta</h3>
                             </div>
                             <div className="card-body-premium">
-                                <div className="settings-toggle-item small">
-                                    <div>
-                                        <strong>Aprobación Automática</strong>
-                                        <p>Citas de clientes VIP sugeridas.</p>
-                                    </div>
-                                    <div className={`premium-switch ${settings.autoApprove ? 'active' : ''}`} onClick={() => setSettings({ ...settings, autoApprove: !settings.autoApprove })}>
-                                        <div className="switch-handle"></div>
-                                    </div>
-                                </div>
+                                <p style={{ color: '#64748b', fontSize: '0.9rem' }}>Las notificaciones del sistema están activas. Pronto podrás configurar canales adicionales aquí.</p>
                             </div>
                         </div>
                     )}
@@ -1585,28 +1603,49 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                 <h3>Seguridad y Acceso</h3>
                             </div>
                             <div className="card-body-premium">
+                                <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+                                    Utiliza esta sección para cambiar tu contraseña maestra del panel administrativo.
+                                </p>
                                 <div className="settings-grid">
-                                    <div className="form-group-admin">
-                                        <label>Contraseña Actual</label>
-                                        <div className="input-with-icon-premium">
-                                            <Lock size={18} />
-                                            <input type="password" placeholder="••••••••" className="premium-input-field" />
-                                        </div>
-                                    </div>
                                     <div className="form-group-admin">
                                         <label>Nueva Contraseña</label>
                                         <div className="input-with-icon-premium">
                                             <Lock size={18} />
-                                            <input type="password" placeholder="••••••••" className="premium-input-field" />
+                                            <input
+                                                type="password"
+                                                placeholder="Mínimo 6 caracteres"
+                                                className="premium-input-field"
+                                                value={newPassword}
+                                                onChange={(e) => setNewPassword(e.target.value)}
+                                            />
                                         </div>
                                     </div>
                                     <div className="form-group-admin">
                                         <label>Confirmar Nueva Contraseña</label>
                                         <div className="input-with-icon-premium">
                                             <Lock size={18} />
-                                            <input type="password" placeholder="••••••••" className="premium-input-field" />
+                                            <input
+                                                type="password"
+                                                placeholder="Repite la contraseña"
+                                                className="premium-input-field"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                            />
                                         </div>
                                     </div>
+                                </div>
+                                <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+                                    <button
+                                        className="btn-primary-admin"
+                                        style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }}
+                                        onClick={async () => {
+                                            await handleUpdatePassword();
+                                            setNewPassword('');
+                                            setConfirmPassword('');
+                                        }}
+                                    >
+                                        <Shield size={16} /> Actualizar Contraseña
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1624,17 +1663,37 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     );
 
 
+    const calcPotential = appointments
+        .filter(a => a.status === 'aprobada')
+        .reduce((acc, curr) => {
+            const service = dbServices.find(s =>
+                s.title?.trim().toLowerCase() === curr.servicio?.trim().toLowerCase()
+            );
+            const price = service ? parseFloat(service.price) : 0;
+            return acc + (isNaN(price) ? 0 : price);
+        }, 0);
+
+    const calcReal = appointments
+        .filter(a => a.status === 'completada')
+        .reduce((acc, curr) => {
+            const service = dbServices.find(s =>
+                s.title?.trim().toLowerCase() === curr.servicio?.trim().toLowerCase()
+            );
+            const price = service ? parseFloat(service.price) : 0;
+            return acc + (isNaN(price) ? 0 : price);
+        }, 0);
+
     const stats = {
         total: appointments.length,
         approved: appointments.filter(a => a.status === 'aprobada').length,
         rejected: appointments.filter(a => a.status === 'rechazada').length,
-        pending: appointments.filter(a => a.status === 'pendiendo').length,
-        revenue: `$${appointments
-            .filter(a => a.status === 'aprobada')
-            .reduce((acc, curr) => {
-                const service = dbServices.find(s => s.title === curr.servicio);
-                return acc + (service?.price || 0);
-            }, 0).toLocaleString()}`
+        pending: appointments.filter(a => a.status === 'pending' || a.status === 'pendiendo').length,
+        completed: appointments.filter(a => a.status === 'completada').length,
+        potential_revenue: `$${calcPotential.toLocaleString()}`,
+        real_revenue: `$${calcReal.toLocaleString()}`,
+        revenue: `$${calcReal.toLocaleString()}`,
+        avg_per_client: `$${clientList.length > 0 ? (calcReal / clientList.length).toFixed(2) : '0.00'}`,
+        client_loyalty: `${clientList.length > 0 ? Math.round((clientList.filter(c => c.visitas > 1).length / clientList.length) * 100) : 0}%`
     };
 
     return (
@@ -1652,7 +1711,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                     <button className={`nav-item ${activeTab === 'appointments' ? 'active' : ''}`} onClick={() => handleTabChange('appointments')}><Calendar size={20} /><span>Citas</span></button>
                     <button className={`nav-item ${activeTab === 'clients' ? 'active' : ''}`} onClick={() => handleTabChange('clients')}><Users size={20} /><span>Clientes</span></button>
                     <button className={`nav-item ${activeTab === 'expenses' ? 'active' : ''}`} onClick={() => handleTabChange('expenses')}><Receipt size={20} /><span>Gastos</span></button>
-                    <button className={`nav-item ${activeTab === 'services' ? 'active' : ''}`} onClick={() => handleTabChange('services')}><Sparkles size={20} /><span>Servicios</span></button>
+                    <button className={`nav-item ${activeTab === 'services' ? 'active' : ''}`} onClick={() => handleTabChange('services')}><Sparkle size={20} /><span>Servicios</span></button>
                     <button className={`nav-item ${activeTab === 'reports' ? 'active' : ''}`} onClick={() => handleTabChange('reports')}><TrendingUp size={20} /><span>Reportes</span></button>
                 </nav>
                 <div className="sidebar-footer">
@@ -1744,7 +1803,13 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                         <div className="modal-header-details">
                             <div className="avatar-large">{selectedAppointment.nombre.charAt(0)}</div>
                             <h2>Detalles de la Cita</h2>
-                            <span className={`status-pill ${selectedAppointment.status}`}>{selectedAppointment.status}</span>
+                            <span className={`status-pill ${selectedAppointment.status}`}>
+                                {(selectedAppointment.status === 'pending' || selectedAppointment.status === 'pendiendo') ? 'Pendiente' :
+                                    selectedAppointment.status === 'completada' ? 'Completada' :
+                                        selectedAppointment.status === 'aprobada' ? 'Aprobada' :
+                                            selectedAppointment.status === 'rechazada' ? 'Rechazada' :
+                                                selectedAppointment.status.charAt(0).toUpperCase() + selectedAppointment.status.slice(1)}
+                            </span>
                         </div>
                         <div className="details-grid">
                             <div className="detail-box"><label>Cliente</label><strong>{selectedAppointment.nombre}</strong></div>
@@ -1768,7 +1833,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                     <div className="premium-modal">
                         <div className="modal-icon-warning"><Trash2 size={32} /></div>
                         <h2>¿Confirmar eliminación?</h2>
-                        <p>Esta acción no se puede deshacer.</p>
+                        <p>{itemToDelete?.message || 'Esta acción no se puede deshacer.'}</p>
                         <div className="modal-actions">
                             <button className="btn-modal-cancel" onClick={() => setShowDeleteModal(false)}>Cancelar</button>
                             <button className="btn-modal-confirm" onClick={confirmDelete}>Sí, Eliminar</button>
@@ -1782,8 +1847,8 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                     <div className="premium-modal details-modal">
                         <div className="modal-header-details"><h2>Editar Cliente</h2></div>
                         <div className="edit-form">
-                            <div className="form-group-admin"><label>Nombre</label><input type="text" className="premium-input-field" value={editingClient.nombre} onChange={(e) => setEditingClient({ ...editingClient, nombre: e.target.value })} /></div>
-                            <div className="form-group-admin"><label>Email</label><input type="email" className="premium-input-field" value={editingClient.email} onChange={(e) => setEditingClient({ ...editingClient, email: e.target.value })} /></div>
+                            <div className="form-group-admin"><label>Nombre</label><input type="text" className="premium-input-field" placeholder="Ej. Maria Perez" value={editingClient.nombre} onChange={(e) => setEditingClient({ ...editingClient, nombre: e.target.value })} /></div>
+
                             <div className="form-group-admin">
                                 <label>Categoría</label>
                                 <CustomSelect
@@ -1806,7 +1871,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                     <div className="premium-modal details-modal">
                         <div className="modal-header-details"><h2>Nueva Cita</h2></div>
                         <div className="edit-form">
-                            <div className="form-group-admin"><label>Cliente</label><input type="text" className="premium-input-field" value={newApp.nombre} onChange={(e) => setNewApp({ ...newApp, nombre: e.target.value })} /></div>
+                            <div className="form-group-admin"><label>Cliente</label><input type="text" className="premium-input-field" placeholder="Nombre del cliente..." value={newApp.nombre} onChange={(e) => setNewApp({ ...newApp, nombre: e.target.value })} /></div>
                             <div className="form-group-admin">
                                 <label>Servicio</label>
                                 <CustomSelect
@@ -1833,8 +1898,15 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                     <div className="premium-modal details-modal">
                         <div className="modal-header-details"><h2>Nuevo Cliente</h2></div>
                         <div className="edit-form">
-                            <div className="form-group-admin"><label>Nombre</label><input type="text" className="premium-input-field" value={newClient.nombre} onChange={(e) => setNewClient({ ...newClient, nombre: e.target.value })} /></div>
-                            <div className="form-group-admin"><label>Email</label><input type="email" className="premium-input-field" value={newClient.email} onChange={(e) => setNewClient({ ...newClient, email: e.target.value })} /></div>
+                            <div className="form-group-admin"><label>Nombre</label><input type="text" className="premium-input-field" placeholder="Ej. Maria Perez" value={newClient.nombre} onChange={(e) => setNewClient({ ...newClient, nombre: e.target.value })} /></div>
+                            <div className="form-group-admin">
+                                <label>Categoría</label>
+                                <CustomSelect
+                                    value={newClient.status}
+                                    options={['Nuevo', 'Frecuente', 'VIP']}
+                                    onChange={(val) => setNewClient({ ...newClient, status: val })}
+                                />
+                            </div>
                         </div>
                         <div className="modal-actions">
                             <button className="btn-modal-cancel" onClick={() => setShowNewClientModal(false)}>Cancelar</button>
@@ -1848,9 +1920,9 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                 <div className="admin-modal-overlay">
                     <div className="premium-modal">
                         <h2>Registrar Nuevo Gasto</h2>
-                        <div className="modal-form-grid" style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
+                        <div className="modal-form-grid" style={{ display: 'grid', gap: '1.25rem', marginTop: '1.5rem' }}>
                             <div className="form-group-admin"><label>Concepto</label><input className="premium-input-field" placeholder="Ej: Insumos" value={newExpense.concepto} onChange={(e) => setNewExpense({ ...newExpense, concepto: e.target.value })} /></div>
-                            <div className="form-group-admin"><label>Monto ($)</label><input type="number" className="premium-input-field" value={newExpense.monto} onChange={(e) => setNewExpense({ ...newExpense, monto: e.target.value })} /></div>
+                            <div className="form-group-admin"><label>Monto ($)</label><input type="number" className="premium-input-field" placeholder="0.00" value={newExpense.monto} onChange={(e) => setNewExpense({ ...newExpense, monto: e.target.value })} /></div>
                             <div className="form-group-admin">
                                 <label>Categoría</label>
                                 <CustomSelect
@@ -1872,33 +1944,52 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                 <div className="admin-modal-overlay">
                     <div className="premium-modal details-modal">
                         <div className="modal-header-details"><h2>Nuevo Servicio</h2></div>
-                        <div className="edit-form">
-                            <div className="form-group-admin"><label>Título</label><input type="text" className="premium-input-field" placeholder="Ej: Masaje de Piedras" value={newService.title} onChange={(e) => setNewService({ ...newService, title: e.target.value })} /></div>
-                            <div className="form-group-admin"><label>Descripción</label><textarea className="premium-input-field" rows="3" value={newService.description} onChange={(e) => setNewService({ ...newService, description: e.target.value })} /></div>
-                            <div className="details-grid" style={{ padding: 0 }}>
-                                <div className="form-group-admin"><label>Precio ($)</label><input type="number" className="premium-input-field" value={newService.price} onChange={(e) => setNewService({ ...newService, price: e.target.value })} /></div>
+                        <div className="edit-form premium-form-v2">
+                            <div className="form-group-admin">
+                                <label><Type size={14} /> Título</label>
+                                <div className="input-with-icon-premium">
+                                    <Sparkle size={16} />
+                                    <input type="text" className="premium-input-field" placeholder="Nombre del servicio" value={newService.title} onChange={(e) => setNewService({ ...newService, title: e.target.value })} />
+                                </div>
+                            </div>
+
+                            <div className="form-group-admin">
+                                <label><AlignLeft size={14} /> Descripción</label>
+                                <textarea className="premium-input-field" rows="2" placeholder="Breve descripción..." value={newService.description} onChange={(e) => setNewService({ ...newService, description: e.target.value })} />
+                            </div>
+
+                            <div className="details-grid" style={{ padding: 0, gap: '1.5rem' }}>
                                 <div className="form-group-admin">
-                                    <label>Icono</label>
+                                    <label><DollarSign size={16} /> Precio ($)</label>
+                                    <input type="number" className="premium-input-field" placeholder="0.00" value={newService.price} onChange={(e) => setNewService({ ...newService, price: e.target.value })} />
+                                </div>
+                                <div className="form-group-admin">
+                                    <label><Sparkle size={16} /> Icono Visual</label>
                                     <CustomSelect
                                         value={newService.icon_name}
-                                        options={['Sparkles', 'Flower2', 'Wind', 'Heart', 'Waves', 'Zap', 'Flame', 'Activity']}
+                                        options={['Sparkle', 'Flower2', 'Wind', 'Heart', 'Waves', 'Zap', 'Flame', 'Activity']}
                                         onChange={(val) => setNewService({ ...newService, icon_name: val })}
                                     />
                                 </div>
                             </div>
-                            <div className="settings-toggle-item small" style={{ marginTop: '1rem' }}>
-                                <div>
-                                    <strong>Mostrar Precio en Web</strong>
-                                    <p>Si se apaga, el cliente no verá el precio.</p>
+
+                            <div className="settings-toggle-item premium-toggle-box" style={{ marginTop: '0.5rem' }}>
+                                <div className="toggle-info">
+                                    <div className="toggle-icon-bg"><Eye size={16} /></div>
+                                    <div><strong>Precio en Web</strong></div>
                                 </div>
                                 <div className={`premium-switch ${newService.show_price ? 'active' : ''}`} onClick={() => setNewService({ ...newService, show_price: !newService.show_price })}>
                                     <div className="switch-handle"></div>
                                 </div>
                             </div>
                         </div>
-                        <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
-                            <button className="btn-modal-cancel" onClick={() => setShowNewServiceModal(false)}>Cancelar</button>
-                            <button className="btn-primary-admin" onClick={handleCreateService}>Crear Servicio</button>
+                        <div className="modal-actions" style={{ marginTop: '1.5rem', borderTop: '1px solid #edf2f7', paddingTop: '1rem' }}>
+                            <button className="btn-modal-cancel" onClick={() => setShowNewServiceModal(false)}>
+                                <X size={16} /> Cancelar
+                            </button>
+                            <button className="btn-primary-admin" onClick={handleCreateService}>
+                                <Plus size={16} /> Crear Servicio
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1908,33 +1999,52 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                 <div className="admin-modal-overlay">
                     <div className="premium-modal details-modal">
                         <div className="modal-header-details"><h2>Editar Servicio</h2></div>
-                        <div className="edit-form">
-                            <div className="form-group-admin"><label>Título</label><input type="text" className="premium-input-field" value={editingService.title} onChange={(e) => setEditingService({ ...editingService, title: e.target.value })} /></div>
-                            <div className="form-group-admin"><label>Descripción</label><textarea className="premium-input-field" rows="3" value={editingService.description} onChange={(e) => setEditingService({ ...editingService, description: e.target.value })} /></div>
-                            <div className="details-grid" style={{ padding: 0 }}>
-                                <div className="form-group-admin"><label>Precio ($)</label><input type="number" className="premium-input-field" value={editingService.price} onChange={(e) => setEditingService({ ...editingService, price: e.target.value })} /></div>
+                        <div className="edit-form premium-form-v2">
+                            <div className="form-group-admin">
+                                <label><Type size={14} /> Título</label>
+                                <div className="input-with-icon-premium">
+                                    <Sparkle size={16} />
+                                    <input type="text" className="premium-input-field" value={editingService.title} onChange={(e) => setEditingService({ ...editingService, title: e.target.value })} />
+                                </div>
+                            </div>
+
+                            <div className="form-group-admin">
+                                <label><AlignLeft size={14} /> Descripción</label>
+                                <textarea className="premium-input-field" rows="2" value={editingService.description} onChange={(e) => setEditingService({ ...editingService, description: e.target.value })} />
+                            </div>
+
+                            <div className="details-grid" style={{ padding: 0, gap: '1.5rem' }}>
                                 <div className="form-group-admin">
-                                    <label>Icono</label>
+                                    <label><DollarSign size={14} /> Precio ($)</label>
+                                    <input type="number" className="premium-input-field" value={editingService.price} onChange={(e) => setEditingService({ ...editingService, price: e.target.value })} />
+                                </div>
+                                <div className="form-group-admin">
+                                    <label><Sparkle size={14} /> Icono</label>
                                     <CustomSelect
                                         value={editingService.icon_name}
-                                        options={['Sparkles', 'Flower2', 'Wind', 'Heart', 'Waves', 'Zap', 'Flame', 'Activity']}
+                                        options={['Sparkle', 'Flower2', 'Wind', 'Heart', 'Waves', 'Zap', 'Flame', 'Activity']}
                                         onChange={(val) => setEditingService({ ...editingService, icon_name: val })}
                                     />
                                 </div>
                             </div>
-                            <div className="settings-toggle-item small" style={{ marginTop: '1rem' }}>
-                                <div>
-                                    <strong>Mostrar Precio en Web</strong>
-                                    <p>Si se apaga, el cliente no verá el precio.</p>
+
+                            <div className="settings-toggle-item premium-toggle-box" style={{ marginTop: '0.5rem' }}>
+                                <div className="toggle-info">
+                                    <div className="toggle-icon-bg"><Eye size={16} /></div>
+                                    <div><strong>Precio en Web</strong></div>
                                 </div>
                                 <div className={`premium-switch ${editingService.show_price ? 'active' : ''}`} onClick={() => setEditingService({ ...editingService, show_price: !editingService.show_price })}>
                                     <div className="switch-handle"></div>
                                 </div>
                             </div>
                         </div>
-                        <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
-                            <button className="btn-modal-cancel" onClick={() => setShowEditServiceModal(false)}>Cancelar</button>
-                            <button className="btn-primary-admin" onClick={saveEditService}>Guardar Cambios</button>
+                        <div className="modal-actions" style={{ marginTop: '1.5rem', borderTop: '1px solid #edf2f7', paddingTop: '1rem' }}>
+                            <button className="btn-modal-cancel" onClick={() => setShowEditServiceModal(false)}>
+                                <X size={16} /> Cancelar
+                            </button>
+                            <button className="btn-primary-admin" onClick={saveEditService}>
+                                <Save size={16} /> Guardar Cambios
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1947,7 +2057,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                             <div className="avatar-huge">{selectedClient.nombre.charAt(0)}</div>
                             <div className="client-header-info">
                                 <h2>{selectedClient.nombre}</h2>
-                                <p>{selectedClient.email} • <span className={`status-pill ${selectedClient.status.toLowerCase()}`}>{selectedClient.status}</span></p>
+                                <p><span className={`status-pill ${selectedClient.status.toLowerCase()}`}>{selectedClient.status}</span></p>
                             </div>
                         </div>
                         <div className="client-stats-row">
@@ -1956,7 +2066,9 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                             <div className="mini-stat"><span>Última</span><strong>{selectedClient.ultimaVisita}</strong></div>
                         </div>
                         <div className="modal-actions">
-                            <button className="btn-modal-cancel" onClick={() => setSelectedClient(null)}>Cerrar</button>
+                            <button className="btn-modal-cancel" onClick={() => setSelectedClient(null)}>
+                                <X size={18} /> Cerrar
+                            </button>
                         </div>
                     </div>
                 </div>

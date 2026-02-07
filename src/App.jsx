@@ -17,19 +17,21 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isResetting, setIsResetting] = useState(false);
+  const [spaSettings, setSpaSettings] = useState({
+    spaName: 'Venus Elegant Spa',
+    phone: '+1 (849) 316-4217',
+    address: 'Plaza Rubi Av. España #69, 3er nivel, local 303, Santo Domingo Este'
+  });
 
+  // Auth logic - runs once
   useEffect(() => {
-    // Verificar sesión inicial
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsLoggedIn(!!session);
       setLoading(false);
     });
 
-    // Escuchar cambios en la autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setIsLoggedIn(!!session);
-
-      // Detectar si venimos de un correo de recuperación
       if (event === 'PASSWORD_RECOVERY') {
         setIsResetting(true);
         setView('admin');
@@ -39,13 +41,9 @@ function App() {
 
     const handleHash = () => {
       const hash = window.location.hash;
-      // Ser más flexible con el hash: si empieza con #/admin o contiene tokens de acceso
       if (hash.startsWith('#/admin') || hash.includes('access_token')) {
         setView('admin');
-        // Si detectamos manualmente que es una recuperación de contraseña por la URL
-        if (hash.includes('type=recovery')) {
-          setIsResetting(true);
-        }
+        if (hash.includes('type=recovery')) setIsResetting(true);
       } else {
         setView('home');
       }
@@ -60,6 +58,52 @@ function App() {
     };
   }, []);
 
+  // Settings logic - refreshes when view changes or via Realtime
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase.from('settings').select('*').single();
+        if (data && !error) {
+          setSpaSettings({
+            spaName: data.spa_name || 'Venus Elegant Spa',
+            phone: data.phone || '+1 (849) 316-4217',
+            address: data.address || 'Plaza Rubi Av. España #69, 3er nivel, local 303, Santo Domingo Este',
+            openingHour: data.opening_hour || '09:00',
+            closingHour: data.closing_hour || '19:00',
+            appointmentsInterval: data.appointments_interval || '60 min',
+            autoApprove: data.auto_approve || false
+          });
+        }
+      } catch (err) {
+        console.error("Error loading settings:", err);
+      }
+    };
+
+    fetchSettings();
+
+    const settingsSubscription = supabase
+      .channel('settings-changes-app')
+      .on('postgres_changes', { event: '*', table: 'settings' }, (payload) => {
+        if (payload.new) {
+          const newData = payload.new;
+          setSpaSettings({
+            spaName: newData.spa_name || 'Venus Elegant Spa',
+            phone: newData.phone || '+1 (849) 316-4217',
+            address: newData.address || 'Plaza Rubi Av. España #69, 3er nivel, local 303, Santo Domingo Este',
+            openingHour: newData.opening_hour || '09:00',
+            closingHour: newData.closing_hour || '19:00',
+            appointmentsInterval: newData.appointments_interval || '60 min',
+            autoApprove: newData.auto_approve || false
+          });
+        }
+      })
+      .subscribe();
+
+    return () => {
+      settingsSubscription.unsubscribe();
+    };
+  }, [view]);
+
   if (loading) return null;
 
   if (view === 'admin' || isResetting) {
@@ -73,22 +117,23 @@ function App() {
         await supabase.auth.signOut();
         setIsLoggedIn(false);
         setIsResetting(false);
+        window.location.hash = '#/';
       }}
     />;
   }
 
   return (
     <div className="app-container">
-      <Navbar />
+      <Navbar spaSettings={spaSettings} />
       <main>
-        <Hero />
+        <Hero spaSettings={spaSettings} />
         <About />
         <Services />
         <Gallery />
-        <Booking />
+        <Booking spaSettings={spaSettings} />
       </main>
-      <Footer />
-      <WhatsAppButton />
+      <Footer spaSettings={spaSettings} />
+      <WhatsAppButton spaSettings={spaSettings} />
     </div>
   )
 }

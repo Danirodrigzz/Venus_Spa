@@ -202,12 +202,12 @@
     bottom: 0;
     color: transparent;
     cursor: pointer;
-    height: auto;
+    height: 100%;
     left: 0;
     position: absolute;
     right: 0;
     top: 0;
-    width: auto;
+    width: 100%;
 }
 
 .form-group input:focus,

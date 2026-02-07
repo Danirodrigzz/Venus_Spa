@@ -40,8 +40,10 @@ const AdminLogin = ({ onLogin }) => {
         setMessage('');
 
         try {
+            // Detectar URL según el entorno (local o producción)
+            const baseUrl = window.location.origin;
             const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: 'https://venus-spa.vercel.app/#/admin',
+                redirectTo: `${baseUrl}/#/admin`,
             });
             if (resetError) throw resetError;
             setMessage('Se ha enviado un correo para restablecer tu contraseña.');
