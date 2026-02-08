@@ -34,6 +34,19 @@ const Booking = ({ spaSettings: globalSettings }) => {
 
     useEffect(() => {
         fetchData();
+
+        // Suscripción en tiempo real para servicios
+        const servicesSubscription = supabase
+            .channel('services-changes-booking')
+            .on('postgres_changes', { event: '*', table: 'services' }, () => {
+                console.log('Servicios actualizados en tiempo real');
+                fetchData();
+            })
+            .subscribe();
+
+        return () => {
+            servicesSubscription.unsubscribe();
+        };
     }, []);
 
     useEffect(() => {
