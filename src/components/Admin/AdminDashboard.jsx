@@ -166,7 +166,19 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
 
         try {
             setLoading(true);
-            const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+            // Verificar que tengamos una sesión activa
+            const { data: { session } } = await supabase.auth.getSession();
+            console.log('Session antes de actualizar contraseña:', session);
+
+            if (!session) {
+                throw new Error('No hay sesión activa. Por favor vuelve a solicitar el enlace de recuperación.');
+            }
+
+            const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+
+            console.log('Resultado de updateUser:', { data, error });
+
             if (error) {
                 // Traducir mensajes de error de Supabase al español
                 let errorMessage = error.message;
@@ -174,9 +186,17 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                     errorMessage = 'La nueva contraseña debe ser diferente de la anterior';
                 } else if (errorMessage.includes('Password should be')) {
                     errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+                } else if (errorMessage.includes('session')) {
+                    errorMessage = 'La sesión ha expirado. Por favor solicita un nuevo enlace de recuperación.';
                 }
                 throw new Error(errorMessage);
             }
+
+            if (!data?.user) {
+                throw new Error('No se pudo actualizar la contraseña. Inténtalo de nuevo.');
+            }
+
+            console.log('Contraseña actualizada correctamente para email:', data.user.email);
 
             showToast('✅ Contraseña actualizada con éxito. Ya puedes usar el panel.');
             setShowResetModal(false);
@@ -188,6 +208,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
             // Llamar onResetComplete para limpiar el estado isResetting
             onResetComplete();
         } catch (error) {
+            console.error('Error al cambiar contraseña:', error);
             showToast(error.message, 'error');
         } finally {
             setLoading(false);
