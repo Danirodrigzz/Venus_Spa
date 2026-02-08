@@ -52,14 +52,35 @@
 
 @media (max-width: 576px) {
     .whatsapp-float {
-        bottom: 25px;
-        right: 25px;
-        width: 50px;
-        height: 50px;
+        bottom: 20px;
+        right: 20px;
+        width: 55px;
+        height: 55px;
+        box-shadow: 0 8px 20px rgba(172, 109, 57, 0.35);
     }
 
     .whatsapp-float svg {
         width: 28px;
         height: 28px;
+    }
+
+    .tooltip {
+        display: none;
+        /* Ocultar tooltip en móvil para evitar superposiciones */
+    }
+}
+
+/* Estilos para tablets */
+@media (min-width: 577px) and (max-width: 991px) {
+    .whatsapp-float {
+        bottom: 30px;
+        right: 30px;
+        width: 56px;
+        height: 56px;
+    }
+
+    .whatsapp-float svg {
+        width: 30px;
+        height: 30px;
     }
 }

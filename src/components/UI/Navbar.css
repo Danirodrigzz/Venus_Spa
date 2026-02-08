@@ -103,17 +103,31 @@
 }
 
 @media (max-width: 991px) {
+    .navbar {
+        padding: 15px 5%;
+    }
+
+    .navbar-container {
+        position: relative;
+    }
+
+    .nav-logo-img {
+        height: 70px;
+    }
+
     .nav-links {
         position: fixed;
         top: 0;
         right: -100%;
         width: 80%;
+        max-width: 350px;
         height: 100vh;
         background: var(--bg-primary);
         flex-direction: column;
         justify-content: center;
         transition: 0.5s ease-in-out;
         box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+        z-index: 999;
     }
 
     .nav-links.open {
@@ -123,6 +137,15 @@
     .menu-toggle {
         display: block;
         z-index: 1001;
+        position: relative;
+        padding: 8px;
+        background: rgba(172, 109, 57, 0.1);
+        border-radius: 8px;
+        transition: var(--transition);
+    }
+
+    .menu-toggle:active {
+        transform: scale(0.95);
     }
 
     .social-desktop {
