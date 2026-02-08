@@ -18,6 +18,27 @@ const AuthCallback = () => {
 
                 console.log('Auth callback triggered:', { access_token, token_hash, type, recovery_type });
 
+                // Verify the OTP token if present (for email recovery links)
+                if (token_hash && recovery_type === 'recovery') {
+                    const { data, error } = await supabase.auth.verifyOtp({
+                        token_hash,
+                        type: 'recovery',
+                    });
+
+                    if (error) {
+                        console.error('Error verifying OTP:', error);
+                        alert('El enlace ha expirado o es inválido. Por favor solicita un nuevo enlace de recuperación.');
+                        window.location.href = '/#/admin';
+                        return;
+                    }
+
+                    console.log('OTP verified successfully:', data);
+
+                    // Redirect with recovery flag to trigger the password reset modal
+                    window.location.href = '/#/admin?type=recovery';
+                    return;
+                }
+
                 // If we have tokens in the hash, set the session
                 if (access_token && refresh_token) {
                     const { error } = await supabase.auth.setSession({
@@ -31,16 +52,16 @@ const AuthCallback = () => {
                         window.location.href = '/#/admin';
                         return;
                     }
+
+                    // Check if it's a recovery session
+                    if (type === 'recovery') {
+                        window.location.href = '/#/admin?type=recovery';
+                        return;
+                    }
                 }
 
-                // If it's a password recovery, redirect to admin in reset mode
-                if (type === 'recovery' || recovery_type === 'recovery') {
-                    // Redirect to admin with recovery flag
-                    window.location.href = '/#/admin';
-                } else {
-                    // Regular login callback
-                    window.location.href = '/#/admin';
-                }
+                // Regular login callback
+                window.location.href = '/#/admin';
             } catch (error) {
                 console.error('Auth callback error:', error);
                 alert('Ocurrió un error. Redirigiendo al login...');

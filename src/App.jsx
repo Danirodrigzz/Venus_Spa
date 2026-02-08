@@ -43,16 +43,20 @@ function App() {
     const handleHash = () => {
       const hash = window.location.hash;
       const path = window.location.pathname;
+      const search = window.location.search;
 
       // Handle Supabase auth callback
-      if (path.includes('/auth/confirm') || hash.includes('access_token') || hash.includes('type=recovery')) {
+      if (path.includes('/auth/confirm')) {
         setView('auth-callback');
         return;
       }
 
       if (hash.startsWith('#/admin')) {
         setView('admin');
-        if (hash.includes('type=recovery')) setIsResetting(true);
+        // Check for recovery mode in hash or search params
+        if (hash.includes('type=recovery') || search.includes('type=recovery')) {
+          setIsResetting(true);
+        }
       } else {
         setView('home');
       }
