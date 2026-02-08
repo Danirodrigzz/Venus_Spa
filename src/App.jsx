@@ -9,6 +9,7 @@ import Footer from './components/UI/Footer'
 import WhatsAppButton from './components/UI/WhatsAppButton'
 import AdminDashboard from './components/Admin/AdminDashboard'
 import AdminLogin from './components/Admin/AdminLogin'
+import AuthCallback from './components/Admin/AuthCallback'
 import { supabase } from './lib/supabase'
 import './index.css'
 
@@ -41,7 +42,15 @@ function App() {
 
     const handleHash = () => {
       const hash = window.location.hash;
-      if (hash.startsWith('#/admin') || hash.includes('access_token')) {
+      const path = window.location.pathname;
+
+      // Handle Supabase auth callback
+      if (path.includes('/auth/confirm') || hash.includes('access_token') || hash.includes('type=recovery')) {
+        setView('auth-callback');
+        return;
+      }
+
+      if (hash.startsWith('#/admin')) {
         setView('admin');
         if (hash.includes('type=recovery')) setIsResetting(true);
       } else {
@@ -105,6 +114,11 @@ function App() {
   }, [view]);
 
   if (loading) return null;
+
+  // Handle auth callback from Supabase
+  if (view === 'auth-callback') {
+    return <AuthCallback />;
+  }
 
   if (view === 'admin' || isResetting) {
     if (!isLoggedIn && !isResetting) {
