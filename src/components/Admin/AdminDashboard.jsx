@@ -167,9 +167,25 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
         try {
             setLoading(true);
             const { error } = await supabase.auth.updateUser({ password: newPassword });
-            if (error) throw error;
-            showToast('Contraseña actualizada con éxito');
+            if (error) {
+                // Traducir mensajes de error de Supabase al español
+                let errorMessage = error.message;
+                if (errorMessage.includes('New password should be different')) {
+                    errorMessage = 'La nueva contraseña debe ser diferente de la anterior';
+                } else if (errorMessage.includes('Password should be')) {
+                    errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+                }
+                throw new Error(errorMessage);
+            }
+
+            showToast('✅ Contraseña actualizada con éxito. Ya puedes usar el panel.');
             setShowResetModal(false);
+            setNewPassword('');
+
+            // Limpiar el parámetro de recovery de la URL sin recargar
+            window.history.replaceState({}, '', '/#/admin');
+
+            // Llamar onResetComplete para limpiar el estado isResetting
             onResetComplete();
         } catch (error) {
             showToast(error.message, 'error');

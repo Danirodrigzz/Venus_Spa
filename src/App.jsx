@@ -38,6 +38,10 @@ function App() {
         setView('admin');
         window.location.hash = '#/admin';
       }
+      if (event === 'USER_UPDATED') {
+        // Cuando se actualiza el usuario (ej: cambio de contraseña), asegurar que está logueado
+        setIsLoggedIn(true);
+      }
     });
 
     const handleHash = () => {

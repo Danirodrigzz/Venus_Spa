@@ -24,7 +24,18 @@ const AdminLogin = ({ onLogin }) => {
                 password,
             });
 
-            if (authError) throw authError;
+            if (authError) {
+                // Traducir mensajes de error al español
+                let errorMessage = authError.message;
+                if (errorMessage.includes('Invalid login credentials')) {
+                    errorMessage = 'Credenciales inválidas. Verifica tu correo y contraseña.';
+                } else if (errorMessage.includes('Email not confirmed')) {
+                    errorMessage = 'Por favor confirma tu correo electrónico.';
+                } else if (errorMessage.includes('Invalid email')) {
+                    errorMessage = 'Correo electrónico inválido.';
+                }
+                throw new Error(errorMessage);
+            }
             if (data?.user) onLogin();
         } catch (err) {
             setError(err.message || 'Error al iniciar sesión. Verifique sus credenciales.');
