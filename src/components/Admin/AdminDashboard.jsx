@@ -1721,10 +1721,22 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                             <input
                                                 type="text"
                                                 className="premium-input-field"
+                                                placeholder="Ej: +18091234567"
                                                 value={settings.phone}
                                                 onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
                                             />
                                         </div>
+                                        <small style={{
+                                            display: 'block',
+                                            marginTop: '8px',
+                                            color: '#64748b',
+                                            fontSize: '0.8rem',
+                                            fontStyle: 'italic'
+                                        }}>
+                                            📱 Usa el formato internacional con código de país (sin espacios ni guiones)
+                                            <br />
+                                            <strong style={{ color: '#AC6D39' }}>Ejemplo:</strong> +18091234567 (República Dominicana), +34612345678 (España)
+                                        </small>
                                     </div>
                                     <div className="form-group-admin">
                                         <label>Moneda del Sistema</label>
@@ -2000,21 +2012,6 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                     {activeTab === 'settings' && renderSettings()}
                 </div>
             </main>
-
-            {/* Modals */}
-            {showLogoutModal && (
-                <div className="admin-modal-overlay">
-                    <div className="premium-modal">
-                        <div className="modal-icon-warning"><LogOut size={32} /></div>
-                        <h2>¿Cerrar Sesión?</h2>
-                        <p>Estás a punto de salir del panel administrativo. ¿Deseas continuar?</p>
-                        <div className="modal-actions">
-                            <button className="btn-modal-cancel" onClick={() => setShowLogoutModal(false)}>Cancelar</button>
-                            <button className="btn-modal-confirm" onClick={handleLogout}>Sí, Salir</button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {selectedAppointment && (
                 <div className="admin-modal-overlay">
