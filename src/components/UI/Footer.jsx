@@ -1,5 +1,5 @@
 import React from 'react';
-import { Instagram, Facebook, MapPin, Phone } from 'lucide-react';
+import { Instagram, Facebook, MapPin, Phone, Heart } from 'lucide-react';
 import './Footer.css';
 
 const Footer = ({ spaSettings }) => {
@@ -38,8 +38,8 @@ const Footer = ({ spaSettings }) => {
 
                 <div className="footer-bottom">
                     <p>&copy; {new Date().getFullYear()} Venus Elegant Spa. Todos los derechos reservados.</p>
-                    <p style={{ marginTop: '10px' }}>
-                        Diseñado por <a href="https://portafolio-rust-eight.vercel.app" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>portafolio-rust-eight.vercel.app</a> con mucho amor
+                    <p style={{ marginTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                        Diseñado por <a href="https://daniela-rodriguez.vercel.app" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'underline', marginLeft: '5px', marginRight: '5px' }}>Daniela Rodriguez</a> con mucho amor <Heart size={16} style={{ color: '#e74c3c', fill: '#e74c3c' }} />
                     </p>
                 </div>
             </div>
