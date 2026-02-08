@@ -86,7 +86,6 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState('dashboard');
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [activeMenu, setActiveMenu] = useState(null);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [selectedClient, setSelectedClient] = useState(null);
@@ -1934,7 +1933,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                 </nav>
                 <div className="sidebar-footer">
                     <button className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => handleTabChange('settings')}><Settings size={20} /><span>Configuración</span></button>
-                    <button className="nav-item logout" onClick={() => setShowLogoutModal(true)}><LogOut size={20} /><span>Cerrar Sesión</span></button>
+                    <button className="nav-item logout" onClick={handleLogout}><LogOut size={20} /><span>Cerrar Sesión</span></button>
                 </div>
             </aside>
 

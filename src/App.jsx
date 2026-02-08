@@ -139,7 +139,7 @@ function App() {
         await supabase.auth.signOut();
         setIsLoggedIn(false);
         setIsResetting(false);
-        window.location.hash = '#/';
+        window.location.hash = '#/admin';
       }}
     />;
   }
