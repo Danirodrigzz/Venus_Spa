@@ -15,6 +15,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import './AdminDashboard.css';
 
+// Admin Dashboard - Updated v2.0
+
 const COLORS = ['#AC6D39', '#C58B5F', '#DBC7BB', '#4A3E37', '#7A6F68'];
 
 const AdminIconMap = {
