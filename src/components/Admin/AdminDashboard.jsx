@@ -7,7 +7,7 @@ import {
     Users, Calendar, CheckCircle, XCircle, Clock, TrendingUp, Activity, Search, LayoutDashboard,
     Settings, LogOut, Bell, MoreVertical, Plus, Filter, Download, UserPlus, MessageSquare,
     Mail, Edit2, Trash2, ExternalLink, ChevronDown, ChevronLeft, ChevronRight, Menu, X, FileText, Wallet, Receipt, Shield,
-    Globe, Lock, User, Phone, MapPin, Check, DollarSign, Save, Type, AlignLeft, Sparkle, Eye,
+    Globe, Lock, User, Phone, MapPin, Check, DollarSign, Save, Type, AlignLeft, Sparkle, Eye, EyeOff,
     Flower2, Wind, Heart, Waves, Zap, Flame
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -119,6 +119,8 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     const [showResetModal, setShowResetModal] = useState(isResetting);
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     // Services Management States
     const [showNewServiceModal, setShowNewServiceModal] = useState(false);
@@ -152,6 +154,26 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     const showToast = (message, type = 'success') => {
         setToast({ show: true, message, type });
         setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+    };
+
+    // Función para calcular tiempo relativo
+    const getRelativeTime = (timestamp) => {
+        const now = new Date();
+        const past = new Date(timestamp);
+        const diffMs = now - past;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Justo ahora';
+        if (diffMins === 1) return 'Hace 1 minuto';
+        if (diffMins < 60) return `Hace ${diffMins} minutos`;
+        if (diffHours === 1) return 'Hace 1 hora';
+        if (diffHours < 24) return `Hace ${diffHours} horas`;
+        if (diffDays === 1) return 'Hace 1 día';
+        if (diffDays < 7) return `Hace ${diffDays} días`;
+        if (diffDays < 30) return `Hace ${Math.floor(diffDays / 7)} semanas`;
+        return `Hace ${Math.floor(diffDays / 30)} meses`;
     };
 
     const handleUpdatePassword = async () => {
@@ -223,6 +245,17 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
         fetchAllData();
     }, []);
 
+    // Actualizar notificaciones cada minuto para tiempo real
+    useEffect(() => {
+        const interval = setInterval(() => {
+            // Forzar re-render de notificaciones actualizando el estado
+            setNotifications(prev => [...prev]);
+        }, 60000); // 60 segundos
+
+        return () => clearInterval(interval);
+    }, []);
+
+
     const fetchAllData = async () => {
         setLoading(true);
         try {
@@ -255,7 +288,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
             .from('appointments')
             .select(`
                 *,
-                services (title)
+                services (title, price)
             `)
             .order('created_at', { ascending: false });
 
@@ -264,6 +297,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                 id: app.id,
                 nombre: app.client_name,
                 servicio: app.services?.title || 'Personalizado',
+                precio: app.services?.price || 0,
                 fecha: app.date,
                 hora: app.time,
                 status: app.status,
@@ -271,25 +305,54 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
             }));
             setAppointments(formatted);
 
-            // Derive client list from appointments unique names
+            // Derive client list from appointments - SOLO clientes con citas aprobadas o completadas
             const clientsMap = {};
             formatted.forEach(app => {
+                // FILTRO: Solo contar si la cita está aprobada o completada
+                const isApproved = app.status === 'aprobada' || app.status === 'completada';
+
                 if (!clientsMap[app.nombre]) {
                     clientsMap[app.nombre] = {
                         id: app.nombre,
                         nombre: app.nombre,
-
                         visitas: 0,
-                        totalGastado: '$0',
+                        totalGastado: 0, // Ahora es número
                         ultimaVisita: app.fecha,
-                        status: 'Nuevo'
+                        status: 'Nuevo',
+                        hasApprovedAppointment: false,
+                        servicios: [] // Lista de servicios únicos
                     };
                 }
-                clientsMap[app.nombre].visitas++;
+
+                // Solo contar visitas aprobadas/completadas
+                if (isApproved) {
+                    clientsMap[app.nombre].visitas++;
+                    clientsMap[app.nombre].hasApprovedAppointment = true;
+
+                    // Sumar al total solo si está completada
+                    if (app.status === 'completada') {
+                        clientsMap[app.nombre].totalGastado += app.precio;
+                    }
+
+                    // Agregar servicio a la lista si no está
+                    if (!clientsMap[app.nombre].servicios.includes(app.servicio)) {
+                        clientsMap[app.nombre].servicios.push(app.servicio);
+                    }
+
+                    // Actualizar última visita solo si es aprobada
+                    if (app.fecha > clientsMap[app.nombre].ultimaVisita) {
+                        clientsMap[app.nombre].ultimaVisita = app.fecha;
+                    }
+                }
+
+                // Actualizar categoría basado en visitas aprobadas
                 if (clientsMap[app.nombre].visitas > 10) clientsMap[app.nombre].status = 'VIP';
                 else if (clientsMap[app.nombre].visitas > 3) clientsMap[app.nombre].status = 'Frecuente';
             });
-            setClientList(Object.values(clientsMap));
+
+            // FILTRAR: Solo clientes con al menos una cita aprobada
+            const approvedClients = Object.values(clientsMap).filter(client => client.hasApprovedAppointment);
+            setClientList(approvedClients);
         }
     };
 
@@ -329,29 +392,43 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
     const fetchNotifications = () => {
         const alerts = [];
 
-        // Citas pendientes
-        const pendingCount = appointments.filter(a => a.status === 'pending' || a.status === 'pendiendo').length;
-        if (pendingCount > 0) {
+        // Citas pendientes con timestamp real
+        const pendingApps = appointments.filter(a => a.status === 'pending' || a.status === 'pendiendo');
+        if (pendingApps.length > 0) {
+            // Usa la fecha más reciente de las citas pendientes
+            const mostRecentPending = pendingApps.reduce((latest, app) => {
+                const appDate = new Date(app.fecha + 'T' + app.hora);
+                const latestDate = new Date(latest.fecha + 'T' + latest.hora);
+                return appDate > latestDate ? app : latest;
+            });
+            const timestamp = new Date(mostRecentPending.fecha + 'T' + mostRecentPending.hora);
+
             alerts.push({
                 id: 'pending-alert',
-                text: `Tienes ${pendingCount} cita(s) pendiente(s) de aprobar.`,
-                time: 'Hace un momento',
+                text: `Tienes ${pendingApps.length} cita(s) pendiente(s) de aprobar.`,
+                timestamp: timestamp.toISOString(),
                 unread: true
             });
         }
 
-        // Gastos altos recientes (simulado lógica simple)
+        // Gastos altos recientes con timestamp real
         if (expenses.length > 0 && expenses[0].date === new Date().toISOString().split('T')[0]) {
+            const expenseTimestamp = new Date(expenses[0].date);
             alerts.push({
                 id: 'new-expense',
                 text: `Se registró un nuevo gasto hoy: ${expenses[0].concepto}`,
-                time: 'Hoy',
+                timestamp: expenseTimestamp.toISOString(),
                 unread: true
             });
         }
 
         if (alerts.length === 0) {
-            alerts.push({ id: 1, text: 'Todo al día. No hay nuevas alertas.', time: 'Ahora', unread: false });
+            alerts.push({
+                id: 1,
+                text: 'Todo al día. No hay nuevas alertas.',
+                timestamp: new Date().toISOString(),
+                unread: false
+            });
         }
 
         setNotifications(alerts);
@@ -870,46 +947,58 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                     </td>
                                     <td data-label="Acciones">
                                         <div className="action-row">
-                                            {app.status !== 'completada' && (
+                                            {app.status === 'rechazada' ? (
+                                                <span style={{
+                                                    color: '#94a3b8',
+                                                    fontSize: '0.85rem',
+                                                    fontStyle: 'italic'
+                                                }}>
+                                                    Rechazada - Sin acciones
+                                                </span>
+                                            ) : (
                                                 <>
-                                                    <button onClick={() => updateStatus(app.id, 'aprobada')} className="action-btn approve" data-tooltip="Aprobar Cita">
-                                                        <CheckCircle size={18} />
+                                                    {app.status !== 'completada' && (
+                                                        <>
+                                                            <button onClick={() => updateStatus(app.id, 'aprobada')} className="action-btn approve" data-tooltip="Aprobar Cita">
+                                                                <CheckCircle size={18} />
+                                                            </button>
+                                                            <button onClick={() => updateStatus(app.id, 'completada')} className="action-btn complete" data-tooltip="Finalizar y Cobrar" style={{ color: '#0369a1', background: '#e0f2fe' }}>
+                                                                <Wallet size={18} />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                    <button onClick={() => updateStatus(app.id, 'rechazada')} className="action-btn reject" data-tooltip="Rechazar Cita">
+                                                        <XCircle size={18} />
                                                     </button>
-                                                    <button onClick={() => updateStatus(app.id, 'completada')} className="action-btn complete" data-tooltip="Finalizar y Cobrar" style={{ color: '#0369a1', background: '#e0f2fe' }}>
-                                                        <Wallet size={18} />
-                                                    </button>
+                                                    <div className="more-menu-container">
+                                                        <button
+                                                            className={`action-btn more ${activeMenu === app.id ? 'active' : ''}`}
+                                                            onClick={() => toggleMenu(app.id)}
+                                                            data-tooltip="Más Opciones"
+                                                        >
+                                                            <MoreVertical size={18} />
+                                                        </button>
+
+                                                        {activeMenu === app.id && (
+                                                            <div className="more-dropdown">
+                                                                <button className="dropdown-item" onClick={() => { setSelectedAppointment(app); setActiveMenu(null); }}>
+                                                                    <Activity size={14} /> Ver Detalles
+                                                                </button>
+                                                                <button className="dropdown-item whatsapp" onClick={() => { window.open(`https://wa.me/18493164217`, '_blank'); setActiveMenu(null); }}>
+                                                                    <MessageSquare size={14} /> WhatsApp
+                                                                </button>
+                                                                <button className="dropdown-item" onClick={() => { updateStatus(app.id, 'pending'); setActiveMenu(null); }}>
+                                                                    <Clock size={14} /> Marcar como Pendiente
+                                                                </button>
+                                                                <div className="dropdown-divider"></div>
+                                                                <button className="dropdown-item delete" onClick={() => handleDeleteClick(app.id, 'appointment')}>
+                                                                    <XCircle size={14} /> Eliminar
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </>
                                             )}
-                                            <button onClick={() => updateStatus(app.id, 'rechazada')} className="action-btn reject" data-tooltip="Rechazar Cita">
-                                                <XCircle size={18} />
-                                            </button>
-                                            <div className="more-menu-container">
-                                                <button
-                                                    className={`action-btn more ${activeMenu === app.id ? 'active' : ''}`}
-                                                    onClick={() => toggleMenu(app.id)}
-                                                    data-tooltip="Más Opciones"
-                                                >
-                                                    <MoreVertical size={18} />
-                                                </button>
-
-                                                {activeMenu === app.id && (
-                                                    <div className="more-dropdown">
-                                                        <button className="dropdown-item" onClick={() => { setSelectedAppointment(app); setActiveMenu(null); }}>
-                                                            <Activity size={14} /> Ver Detalles
-                                                        </button>
-                                                        <button className="dropdown-item whatsapp" onClick={() => { window.open(`https://wa.me/18493164217`, '_blank'); setActiveMenu(null); }}>
-                                                            <MessageSquare size={14} /> WhatsApp
-                                                        </button>
-                                                        <button className="dropdown-item" onClick={() => { updateStatus(app.id, 'pending'); setActiveMenu(null); }}>
-                                                            <Clock size={14} /> Marcar como Pendiente
-                                                        </button>
-                                                        <div className="dropdown-divider"></div>
-                                                        <button className="dropdown-item delete" onClick={() => handleDeleteClick(app.id, 'appointment')}>
-                                                            <XCircle size={14} /> Eliminar
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -939,7 +1028,46 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                 </td>
 
                 <td data-label="Visitas"><strong>{client.visitas}</strong></td>
-                <td data-label="Total Gastado"><span className="revenue-text">{client.totalGastado}</span></td>
+                <td data-label="Total Gastado">
+                    <span className="revenue-text">
+                        ${client.totalGastado.toFixed(2)}
+                    </span>
+                </td>
+                <td data-label="Servicios">
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                        {client.servicios && client.servicios.length > 0 ? (
+                            client.servicios.slice(0, 2).map((servicio, idx) => (
+                                <span
+                                    key={idx}
+                                    className="status-pill"
+                                    style={{
+                                        fontSize: '0.75rem',
+                                        padding: '2px 8px',
+                                        background: 'rgba(172, 109, 57, 0.1)',
+                                        color: 'var(--primary)'
+                                    }}
+                                >
+                                    {servicio}
+                                </span>
+                            ))
+                        ) : (
+                            <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>-</span>
+                        )}
+                        {client.servicios && client.servicios.length > 2 && (
+                            <span
+                                className="status-pill"
+                                style={{
+                                    fontSize: '0.75rem',
+                                    padding: '2px 8px',
+                                    background: 'rgba(100, 116, 139, 0.1)',
+                                    color: '#64748b'
+                                }}
+                            >
+                                +{client.servicios.length - 2}
+                            </span>
+                        )}
+                    </div>
+                </td>
                 <td data-label="Última Visita">{client.ultimaVisita}</td>
                 <td data-label="Categoría">
                     <span className={`status-pill ${client.status.toLowerCase()}`}>
@@ -1047,6 +1175,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
 
                                     <th>Visitas</th>
                                     <th>Total Gastado</th>
+                                    <th>Servicios</th>
                                     <th>Última Visita</th>
                                     <th>Categoría</th>
                                     <th>Acciones</th>
@@ -1646,28 +1775,80 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                 <div className="settings-grid">
                                     <div className="form-group-admin">
                                         <label>Nueva Contraseña</label>
-                                        <div className="input-with-icon-premium">
-                                            <Lock size={18} />
-                                            <input
-                                                type="password"
-                                                placeholder="Mínimo 6 caracteres"
-                                                className="premium-input-field"
-                                                value={newPassword}
-                                                onChange={(e) => setNewPassword(e.target.value)}
-                                            />
+                                        <div style={{ position: 'relative' }}>
+                                            <div className="input-with-icon-premium">
+                                                <Lock size={18} />
+                                                <input
+                                                    type={showNewPassword ? "text" : "password"}
+                                                    placeholder="Mínimo 6 caracteres"
+                                                    className="premium-input-field"
+                                                    value={newPassword}
+                                                    onChange={(e) => setNewPassword(e.target.value)}
+                                                    style={{ paddingRight: '50px' }}
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    right: '15px',
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    color: '#64748b',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    padding: '4px',
+                                                    transition: 'color 0.2s',
+                                                    zIndex: 10
+                                                }}
+                                                onMouseEnter={(e) => e.currentTarget.style.color = '#AC6D39'}
+                                                onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
+                                            >
+                                                {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </button>
                                         </div>
                                     </div>
                                     <div className="form-group-admin">
                                         <label>Confirmar Nueva Contraseña</label>
-                                        <div className="input-with-icon-premium">
-                                            <Lock size={18} />
-                                            <input
-                                                type="password"
-                                                placeholder="Repite la contraseña"
-                                                className="premium-input-field"
-                                                value={confirmPassword}
-                                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                            />
+                                        <div style={{ position: 'relative' }}>
+                                            <div className="input-with-icon-premium">
+                                                <Lock size={18} />
+                                                <input
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    placeholder="Repite la contraseña"
+                                                    className="premium-input-field"
+                                                    value={confirmPassword}
+                                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                                    style={{ paddingRight: '50px' }}
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    right: '15px',
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    color: '#64748b',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    padding: '4px',
+                                                    transition: 'color 0.2s',
+                                                    zIndex: 10
+                                                }}
+                                                onMouseEnter={(e) => e.currentTarget.style.color = '#AC6D39'}
+                                                onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
+                                            >
+                                                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1791,7 +1972,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                                         {notifications.map(n => (
                                             <div key={n.id} className={`notif-item ${n.unread ? 'unread' : ''}`}>
                                                 <p>{n.text}</p>
-                                                <span>{n.time}</span>
+                                                <span>{getRelativeTime(n.timestamp)}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -2099,7 +2280,7 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                         </div>
                         <div className="client-stats-row">
                             <div className="mini-stat"><span>Visitas</span><strong>{selectedClient.visitas}</strong></div>
-                            <div className="mini-stat"><span>Total</span><strong>{selectedClient.totalGastado}</strong></div>
+                            <div className="mini-stat"><span>Total</span><strong>${selectedClient.totalGastado.toFixed(2)}</strong></div>
                             <div className="mini-stat"><span>Última</span><strong>{selectedClient.ultimaVisita}</strong></div>
                         </div>
                         <div className="modal-actions">
@@ -2129,23 +2310,79 @@ const AdminDashboard = ({ onLogout, isResetting, onResetComplete }) => {
                             </p>
                             <div className="form-group-admin">
                                 <label>Nueva Contraseña</label>
-                                <input
-                                    type="password"
-                                    className="premium-input-field"
-                                    placeholder="Mínimo 6 caracteres"
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                />
+                                <div style={{ position: 'relative', overflow: 'visible' }}>
+                                    <input
+                                        type={showNewPassword ? "text" : "password"}
+                                        className="premium-input-field"
+                                        placeholder="Mínimo 6 caracteres"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        style={{ paddingRight: '50px', width: '100%' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '15px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: 'transparent',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            color: '#64748b',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: '6px',
+                                            transition: 'color 0.2s',
+                                            zIndex: 100,
+                                            pointerEvents: 'auto'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.color = '#AC6D39'}
+                                        onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
+                                    >
+                                        {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
+                                </div>
                             </div>
                             <div className="form-group-admin">
                                 <label>Confirmar Contraseña</label>
-                                <input
-                                    type="password"
-                                    className="premium-input-field"
-                                    placeholder="Repite la contraseña"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                />
+                                <div style={{ position: 'relative', overflow: 'visible' }}>
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        className="premium-input-field"
+                                        placeholder="Repite la contraseña"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        style={{ paddingRight: '50px', width: '100%' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '15px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: 'transparent',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            color: '#64748b',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: '6px',
+                                            transition: 'color 0.2s',
+                                            zIndex: 100,
+                                            pointerEvents: 'auto'
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.color = '#AC6D39'}
+                                        onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div className="modal-actions" style={{ marginTop: '2rem' }}>
