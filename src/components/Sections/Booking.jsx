@@ -185,11 +185,29 @@ const Booking = ({ spaSettings: globalSettings }) => {
 
             const text = `¡Hola Venus Elegant Spa! Me gustaría agendar una cita.%0A%0A*Nombre:* ${formData.nombre}%0A*Tel:* ${formData.telefono}%0A*Email:* ${formData.email}%0A*Servicio:* ${formData.servicio}%0A*Fecha:* ${formData.fecha}%0A*Hora:* ${formData.hora}${formData.mensaje ? `%0A*Mensaje:* ${formData.mensaje}` : ''}`;
 
-            setIsSuccess(true);
+            // Construir URL de WhatsApp
+            const phoneNumber = spaSettings.phone.replace(/[^0-9]/g, '');
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${text}`;
 
+            console.log('Número de teléfono:', phoneNumber);
+            console.log('URL de WhatsApp:', whatsappUrl);
+
+            setIsSuccess(true);
+            setIsSubmitting(false);
+
+            // Abrir WhatsApp inmediatamente después de mostrar el mensaje de éxito
             setTimeout(() => {
-                window.open(`https://wa.me/${spaSettings.phone.replace(/[^0-9]/g, '')}?text=${text}`, '_blank');
-                setIsSubmitting(false);
+                const whatsappWindow = window.open(whatsappUrl, '_blank');
+
+                // Verificar si el popup fue bloqueado
+                if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed === 'undefined') {
+                    console.warn('Popup bloqueado. Mostrando enlace alternativo.');
+                    // Si el popup fue bloqueado, ofrecer un enlace alternativo
+                    const confirmRedirect = confirm('No se pudo abrir WhatsApp automáticamente. ¿Deseas continuar?');
+                    if (confirmRedirect) {
+                        window.location.href = whatsappUrl;
+                    }
+                }
             }, 1500);
 
         } catch (error) {
@@ -198,6 +216,16 @@ const Booking = ({ spaSettings: globalSettings }) => {
             setIsSubmitting(false);
         }
     };
+
+    // Scroll to success message when it appears
+    useEffect(() => {
+        if (isSuccess) {
+            const bookingSection = document.getElementById('reservas');
+            if (bookingSection) {
+                bookingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }, [isSuccess]);
 
     if (isSuccess) {
         return (
