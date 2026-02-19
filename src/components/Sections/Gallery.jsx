@@ -4,8 +4,12 @@ import './Gallery.css';
 
 const Gallery = () => {
     const images = [
-        { src: '/assets/portada.png', alt: 'Nuestra Sala Principal' },
-        { src: '/assets/sala_1.png', alt: 'Ambiente de Masajes' },
+        { src: '/assets/recepcion_1.jpeg', alt: 'Nuestra Recepción' },
+        { src: '/assets/recepcion_2.jpeg', alt: 'Área de Espera Principal' },
+        { src: '/assets/recepcion_3.jpeg', alt: 'Ambiente Acogedor en Recepción' },
+        { src: '/assets/recepcion_4.jpeg', alt: 'Detalles de Nuestra Entrada' },
+        { src: '/assets/portada.png', alt: 'Sala de Masajes Principal' },
+        { src: '/assets/sala_1.png', alt: 'Ambiente de Masajes Privado' },
         { src: '/assets/pasillo_v2.png', alt: 'Pasillo de Relax' },
         { src: '/assets/sala_2.png', alt: 'Instalaciones Confortables' },
     ];
