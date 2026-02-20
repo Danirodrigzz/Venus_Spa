@@ -18,7 +18,7 @@ const Navbar = () => {
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className="navbar-container">
         <div className="logo">
-          {isScrolled && <img src="/assets/logo_large.png" alt="Venus Elegant Spa" className="nav-logo-img" />}
+          <img src="/assets/logo_black.png" alt="Venus Elegant Spa" className="nav-logo-img" />
         </div>
 
         <div className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
