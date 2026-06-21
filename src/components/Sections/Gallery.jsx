@@ -4,14 +4,14 @@ import './Gallery.css';
 
 const Gallery = () => {
     const images = [
+        { src: '/assets/spa.mp4', alt: 'Recorrido en Video' },
         { src: '/assets/recepcion_1.jpeg', alt: 'Nuestra Recepción' },
-        { src: '/assets/recepcion_2.jpeg', alt: 'Área de Espera Principal' },
-        { src: '/assets/recepcion_3.jpeg', alt: 'Ambiente Acogedor en Recepción' },
         { src: '/assets/recepcion_4.jpeg', alt: 'Detalles de Nuestra Entrada' },
         { src: '/assets/portada.png', alt: 'Sala de Masajes Principal' },
-        { src: '/assets/sala_1.png', alt: 'Ambiente de Masajes Privado' },
-        { src: '/assets/pasillo_v2.png', alt: 'Pasillo de Relax' },
         { src: '/assets/sala_2.png', alt: 'Instalaciones Confortables' },
+        { src: '/assets/spa1.jpeg', alt: 'Relax en Spa' },
+        { src: '/assets/spa2.jpeg', alt: 'Instalaciones de Spa' },
+        { src: '/assets/spa3.jpeg', alt: 'Ambiente Spa' },
     ];
 
     return (
@@ -33,7 +33,11 @@ const Gallery = () => {
                             viewport={{ once: true }}
                             whileHover={{ scale: 1.02 }}
                         >
-                            <img src={img.src} alt={img.alt} />
+                            {img.src.endsWith('.mp4') ? (
+                                <video src={img.src} autoPlay loop muted playsInline />
+                            ) : (
+                                <img src={img.src} alt={img.alt} />
+                            )}
                             <div className="image-overlay">
                                 <span>{img.alt}</span>
                             </div>
