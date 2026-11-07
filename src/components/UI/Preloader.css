@@ -1,0 +1,225 @@
+/* ==========================================================================
+   PRELOADER & IMMERSIVE ENTRY SCREEN — VENUS ELEGANT SPA
+   Fondo atmosférico de lujo con fotografía del spa y cálida penumbra.
+   Sin tiempo automático: espera la elección de entrada del usuario.
+   ========================================================================== */
+
+.preloader-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #140E0A;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  overflow: hidden;
+}
+
+/* Fondo de flor1.jpg con penumbra y calidez cinematográfica */
+.preloader-bg-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  filter: brightness(0.48) saturate(1.08) contrast(1.02);
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+/* Scrim radial cálido para máxima legibilidad y lujo */
+.preloader-scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(26, 18, 14, 0.45) 0%, rgba(14, 10, 7, 0.82) 100%);
+  pointer-events: none;
+}
+
+.preloader-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  padding: 30px;
+  max-width: 580px;
+  width: 90vw;
+}
+
+.preloader-tagline {
+  font-family: var(--font-accent, 'Montserrat', sans-serif);
+  font-size: 0.70rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #E2AD75;
+  font-weight: 500;
+  margin-bottom: 14px;
+  display: block;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.preloader-title {
+  font-family: var(--font-serif, 'Cormorant Garamond', Georgia, serif);
+  font-size: clamp(2.4rem, 6vw, 3.8rem);
+  font-weight: 400;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+  margin-bottom: 24px;
+  line-height: 1.1;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.preloader-title em {
+  font-style: italic;
+  color: #F8D5A3;
+}
+
+/* Hairline Loading Progress */
+.preloader-progress-bar {
+  width: 170px;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.20);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 24px;
+  border-radius: 1px;
+}
+
+.preloader-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #E2AD75;
+  box-shadow: 0 0 10px rgba(226, 173, 117, 0.9);
+}
+
+.preloader-city {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(250, 246, 240, 0.85);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Interactive Entry Choices --- */
+.preloader-actions-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.preloader-btn-sound {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #FAF6F0;
+  color: #1C1410;
+  border: 1px solid #FAF6F0;
+  padding: 13px 30px;
+  font-family: var(--font-accent, 'Montserrat', sans-serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  border-radius: var(--radius-subtle, 2px);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.preloader-btn-sound:hover {
+  background-color: #E2AD75;
+  border-color: #E2AD75;
+  color: #140E0A;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(226, 173, 117, 0.35);
+}
+
+.preloader-btn-silent {
+  background: transparent;
+  border: none;
+  color: rgba(250, 246, 240, 0.75);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.74rem;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s ease;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.preloader-btn-silent::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background-color: currentColor;
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+}
+
+.preloader-btn-silent:hover {
+  color: #FAF6F0;
+}
+
+.preloader-btn-silent:hover::after {
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .preloader-overlay {
+    height: 100dvh;
+    padding: 24px 16px;
+  }
+  .preloader-content {
+    padding: 16px 8px;
+    width: 100%;
+    max-width: 360px;
+  }
+  .preloader-tagline {
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+  }
+  .preloader-title {
+    font-size: clamp(2.1rem, 9vw, 2.8rem);
+    margin-bottom: 20px;
+  }
+  .preloader-progress-bar {
+    width: 140px;
+    margin-bottom: 20px;
+  }
+  .preloader-actions-group {
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .preloader-btn-sound {
+    width: 100%;
+    max-width: 270px;
+    min-height: 48px;
+    padding: 14px 20px;
+    font-size: 0.72rem;
+  }
+  .preloader-btn-silent {
+    padding: 10px 16px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

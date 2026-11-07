@@ -1,86 +1,93 @@
-.whatsapp-float {
-    position: fixed;
-    bottom: 40px;
-    right: 40px;
-    background-color: var(--primary);
-    color: var(--white);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 25px rgba(172, 109, 57, 0.3);
-    z-index: 1000;
-    transition: var(--transition);
-    border: none;
+/* ==========================================================================
+   VENUS ELEGANT SPA — REFINED DISCRETE WHATSAPP CIRCLE
+   Minimalist 46px circular trigger with floating hover pill label.
+   ========================================================================== */
+
+.whatsapp-floating-wrap {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  z-index: 995;
 }
 
-.whatsapp-float svg {
-    width: 32px;
-    height: 32px;
-    transition: var(--transition);
+.whatsapp-circle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: rgba(26, 20, 17, 0.90);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #FAF6F0;
+  border: 1px solid rgba(164, 104, 56, 0.35);
+  text-decoration: none;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-.whatsapp-float:hover {
-    transform: translateY(-5px) scale(1.05);
-    background-color: var(--primary-light);
-    box-shadow: 0 15px 35px rgba(172, 109, 57, 0.4);
+.whatsapp-circle-btn:hover {
+  background-color: #25D366;
+  border-color: #25D366;
+  color: #FFFFFF;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.35);
 }
 
-.tooltip {
-    position: absolute;
-    right: 75px;
-    background: var(--text-main);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: var(--transition);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+.whatsapp-icon {
+  display: block;
 }
 
-.whatsapp-float:hover .tooltip {
-    opacity: 1;
-    visibility: visible;
-    right: 85px;
+/* Floating Hover Pill Label */
+.whatsapp-hover-pill {
+  position: absolute;
+  right: 56px;
+  top: 50%;
+  transform: translateY(-50%) translateX(6px);
+  background-color: rgba(26, 20, 17, 0.94);
+  backdrop-filter: blur(12px);
+  color: #FAF6F0;
+  border: 1px solid rgba(164, 104, 56, 0.25);
+  padding: 6px 14px;
+  border-radius: var(--radius-subtle, 2px);
+  font-family: var(--font-accent, 'Montserrat', sans-serif);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
-@media (max-width: 576px) {
-    .whatsapp-float {
-        bottom: 20px;
-        right: 20px;
-        width: 55px;
-        height: 55px;
-        box-shadow: 0 8px 20px rgba(172, 109, 57, 0.35);
-    }
-
-    .whatsapp-float svg {
-        width: 28px;
-        height: 28px;
-    }
-
-    .tooltip {
-        display: none;
-        /* Ocultar tooltip en móvil para evitar superposiciones */
-    }
+.whatsapp-circle-btn:hover .whatsapp-hover-pill {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
 }
 
-/* Estilos para tablets */
-@media (min-width: 577px) and (max-width: 991px) {
-    .whatsapp-float {
-        bottom: 30px;
-        right: 30px;
-        width: 56px;
-        height: 56px;
-    }
+@media (max-width: 768px) {
+  .whatsapp-floating-wrap {
+    bottom: 20px;
+    right: 18px;
+  }
 
-    .whatsapp-float svg {
-        width: 30px;
-        height: 30px;
-    }
+  .whatsapp-circle-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .whatsapp-hover-pill {
+    display: none; /* Icon-only on mobile to ensure zero obstruction */
+  }
+}
+
+@media (max-width: 375px) {
+  .whatsapp-floating-wrap {
+    bottom: 18px;
+    right: 14px;
+  }
 }

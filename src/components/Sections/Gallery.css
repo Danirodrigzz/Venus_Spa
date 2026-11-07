@@ -1,100 +1,531 @@
-.gallery {
-    background-color: var(--bg-primary);
+/* ==========================================================================
+   VENUS ELEGANT SPA — GALERÍA INTERACTIVA DE ESPACIOS (MOSAICO ASIMÉTRICO)
+   - Composición tipo revista con formatos variados (paisaje, retrato, cuadrado).
+   - Recorrido horizontal con arrastre, rueda de ratón e inercia.
+   - Separadores de estancias (Recepción, Cabinas, Transición, Lounge).
+   - Cursor personalizado cobre ("Ver").
+   - Expansión inmersiva a pantalla completa al hacer clic.
+   ========================================================================== */
+
+.gallery-mosaic-section {
+  background-color: #0E0907;
+  color: #FAF6F0;
+  position: relative;
+  padding: 100px 0 110px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, 300px);
-    gap: 20px;
+/* ==========================================================================
+   1. Encabezado Editorial
+   ========================================================================== */
+.gallery-mosaic-header {
+  margin-bottom: 24px;
+  text-align: center;
+  padding: 0 clamp(20px, 5vw, 40px);
+  box-sizing: border-box;
 }
 
-.gallery-item {
-    position: relative;
-    overflow: hidden;
-    border-radius: 15px;
-    cursor: pointer;
+.gallery-mosaic-kicker {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  color: #D49A58;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: block;
 }
 
-.gallery-item img,
-.gallery-item video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: var(--transition);
+.gallery-mosaic-title {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-size: clamp(2.2rem, 4vw, 3.6rem);
+  font-weight: 350;
+  line-height: 1.12;
+  color: #FAF6F0;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.01em;
 }
 
-.gallery-item:hover img,
-.gallery-item:hover video {
-    transform: scale(1.1);
+.copper-italic {
+  font-style: italic;
+  color: #D49A58;
+  font-weight: 300;
 }
 
-.image-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(172, 109, 57, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: var(--transition);
+.gallery-mosaic-subtitle {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: clamp(0.90rem, 1.1vw, 1.02rem);
+  color: rgba(250, 246, 240, 0.78);
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-weight: 350;
 }
 
-.gallery-item:hover .image-overlay {
-    opacity: 1;
+/* ==========================================================================
+   2. Runway Horizontal & Cursor Cobre
+   ========================================================================== */
+.gallery-runway-wrapper {
+  position: relative;
+  width: 100%;
+  padding: 30px 0 40px;
+  overflow: hidden;
 }
 
-.image-overlay span {
-    color: var(--white);
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    border: 1px solid var(--white);
-    padding: 10px 20px;
+/* Cursor Personalizado Cobre Flotante ("Ver") */
+.gallery-copper-cursor {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #D49A58;
+  color: #0E0907;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 50;
+  box-shadow: 0 6px 24px rgba(212, 154, 88, 0.45);
 }
 
-.item-0 {
-    grid-column: span 2;
-    grid-row: span 2;
+.gallery-runway-track {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 3.2vw, 44px);
+  overflow-x: auto;
+  padding: 40px clamp(24px, 5vw, 80px) 50px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
 }
 
-.item-1 {
-    grid-column: span 2;
-    grid-row: span 1;
+.gallery-runway-track::-webkit-scrollbar {
+  display: none;
 }
 
-.item-2 {
-    grid-column: span 1;
-    grid-row: span 1;
+.gallery-runway-track:active {
+  cursor: grabbing;
 }
 
-.item-3 {
-    grid-column: span 1;
-    grid-row: span 1;
+/* ==========================================================================
+   3. Separador de Estancia Arquitectónica
+   ========================================================================== */
+.gallery-zone-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 280px;
+  min-width: 60px;
+  flex-shrink: 0;
+  user-select: none;
+  pointer-events: none;
 }
 
-@media (max-width: 991px) {
-    .gallery-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: auto;
-    }
-
-    .item-0,
-    .item-1,
-    .item-2,
-    .item-3 {
-        grid-column: span 1;
-        grid-row: span 1;
-        height: 250px;
-    }
+.zone-divider-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.62rem;
+  letter-spacing: 0.30em;
+  text-transform: uppercase;
+  color: #D49A58;
+  font-weight: 500;
 }
 
-@media (max-width: 576px) {
-    .gallery-grid {
-        grid-template-columns: 1fr;
-    }
+.zone-divider-line {
+  width: 1px;
+  height: 70px;
+  background: linear-gradient(180deg, rgba(211, 139, 87, 0.5), transparent);
+}
+
+/* ==========================================================================
+   4. Tarjetas de Fotos Asimétricas
+   ========================================================================== */
+.gallery-mosaic-card {
+  position: relative;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #0A0604;
+  transition: opacity 0.4s ease, box-shadow 0.4s ease;
+  will-change: transform, opacity;
+}
+
+/* Dimensiones Variadas (Revista) */
+.card-large-landscape {
+  width: clamp(380px, 34vw, 490px);
+  height: 350px;
+}
+
+.card-medium-landscape {
+  width: clamp(320px, 28vw, 400px);
+  height: 300px;
+}
+
+.card-tall-portrait {
+  width: clamp(270px, 23vw, 330px);
+  height: 470px;
+}
+
+.card-medium-portrait {
+  width: clamp(280px, 22vw, 320px);
+  height: 390px;
+}
+
+.card-medium-square {
+  width: clamp(260px, 22vw, 310px);
+  height: 310px;
+}
+
+/* Estados de atenuación y enfoque */
+.gallery-mosaic-card.is-dimmed {
+  opacity: 0.35;
+}
+
+.gallery-mosaic-card.is-hovered {
+  opacity: 1;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  z-index: 10;
+}
+
+.card-image-box {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.card-photo-asset {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Tratamiento cálido de color unificado */
+  filter: contrast(1.04) brightness(0.97) sepia(0.08) hue-rotate(-6deg);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gallery-mosaic-card:hover .card-photo-asset {
+  transform: scale(1.04);
+}
+
+.card-soft-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    0deg,
+    rgba(14, 9, 7, 0.88) 0%,
+    rgba(14, 9, 7, 0.30) 40%,
+    transparent 70%
+  );
+  opacity: 0.8;
+  transition: opacity 0.35s ease;
+}
+
+.gallery-mosaic-card:hover .card-soft-scrim {
+  opacity: 0.95;
+}
+
+/* Información en la Tarjeta */
+.card-hover-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 22px 20px;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  z-index: 2;
+  transform: translateY(4px);
+  transition: transform 0.35s ease;
+}
+
+.gallery-mosaic-card:hover .card-hover-caption {
+  transform: translateY(0);
+}
+
+.card-caption-zone {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.60rem;
+  letter-spacing: 0.24em;
+  color: #D49A58;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.card-caption-title {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-size: 1.35rem;
+  font-weight: 350;
+  line-height: 1.15;
+  color: #FAF6F0;
+  margin: 0;
+}
+
+.card-caption-desc {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: rgba(250, 246, 240, 0.75);
+  margin: 4px 0 0 0;
+  font-weight: 350;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Indicador de arrastre */
+.gallery-drag-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.68rem;
+  letter-spacing: 0.20em;
+  color: rgba(250, 246, 240, 0.45);
+  text-transform: uppercase;
+}
+
+.hint-arrow {
+  color: #D49A58;
+  animation: hintPulse 2s infinite ease-in-out;
+}
+
+@keyframes hintPulse {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+/* ==========================================================================
+   5. Modal Inmersivo a Pantalla Completa
+   ========================================================================== */
+.gallery-inmersive-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(8, 5, 3, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(211, 139, 87, 0.35);
+  color: #FAF6F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.modal-close-btn:hover {
+  background: rgba(211, 139, 87, 0.25);
+  border-color: #D49A58;
+  color: #D49A58;
+  transform: scale(1.06);
+}
+
+.modal-arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: rgba(250, 246, 240, 0.45);
+  cursor: pointer;
+  padding: 24px 16px;
+  z-index: 20;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.modal-arrow-btn.arrow-prev { left: 24px; }
+.modal-arrow-btn.arrow-next { right: 24px; }
+
+.modal-arrow-btn:hover {
+  color: #D49A58;
+  transform: translateY(-50%) scale(1.15);
+}
+
+.modal-stage-container {
+  position: relative;
+  max-width: 90vw;
+  max-height: 84vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-photo-wrapper {
+  max-width: 100%;
+  max-height: 74vh;
+  display: flex;
+  justify-content: center;
+}
+
+.modal-photo-img {
+  max-width: 100%;
+  max-height: 74vh;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.7);
+  filter: contrast(1.04) brightness(0.97) sepia(0.08) hue-rotate(-6deg);
+}
+
+.modal-caption-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 100%;
+  margin-top: 18px;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.modal-caption-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-zone-tag {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.64rem;
+  letter-spacing: 0.26em;
+  color: #D49A58;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.modal-space-title {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+  font-weight: 350;
+  line-height: 1.15;
+  color: #FAF6F0;
+  margin: 0 0 6px 0;
+}
+
+.modal-space-desc {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: rgba(250, 246, 240, 0.80);
+  margin: 0;
+  font-weight: 350;
+  max-width: 600px;
+}
+
+.modal-counter {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.72rem;
+  letter-spacing: 0.20em;
+  color: rgba(250, 246, 240, 0.5);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   6. Responsive Móvil
+   ========================================================================== */
+@media (max-width: 768px) {
+  .gallery-mosaic-section {
+    padding: 64px 0 54px;
+  }
+
+  .gallery-mosaic-header {
+    padding: 0 20px;
+    margin-bottom: 24px;
+  }
+
+  .gallery-mosaic-kicker {
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    margin-bottom: 10px;
+  }
+
+  .gallery-mosaic-title {
+    font-size: clamp(1.65rem, 6.5vw, 2.15rem);
+    line-height: 1.22;
+    margin-bottom: 12px;
+  }
+
+  .gallery-mosaic-subtitle {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    padding: 0 8px;
+    color: rgba(250, 246, 240, 0.75);
+  }
+
+  .gallery-copper-cursor {
+    display: none; /* Sin cursor flotante en pantallas táctiles */
+  }
+
+  .gallery-runway-track {
+    gap: 16px;
+    padding: 16px 20px 28px;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 20px;
+  }
+
+  .gallery-zone-divider {
+    height: 180px;
+    min-width: 36px;
+    scroll-snap-align: start;
+  }
+
+  .gallery-mosaic-card {
+    transform: none !important;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .card-large-landscape,
+  .card-medium-landscape,
+  .card-tall-portrait,
+  .card-medium-portrait,
+  .card-medium-square {
+    width: 82vw;
+    max-width: 340px;
+    height: 360px;
+    flex-shrink: 0;
+  }
+
+  .modal-arrow-btn {
+    display: none; /* En móvil se desliza o cierra */
+  }
+
+  .modal-caption-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
 }

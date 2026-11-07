@@ -1,0 +1,120 @@
+/* ==========================================================================
+   SOUND TOGGLE — DISCRETE AMBIENT AUDIO CONTROLLER
+   Fixed minimal audio indicator (bottom-left) with animated equalizer bars.
+   ========================================================================== */
+
+.sound-toggle-fixed {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: rgba(250, 246, 240, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(164, 104, 56, 0.22);
+  padding: 8px 14px;
+  border-radius: var(--radius-subtle, 2px);
+  cursor: pointer;
+  color: var(--text-main);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(30, 23, 19, 0.06);
+}
+
+.sound-toggle-fixed:hover {
+  background-color: rgba(250, 246, 240, 0.98);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+/* Equalizer Bars Container */
+.sound-eq-visualizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 14px;
+  width: 14px;
+  padding-bottom: 1px;
+}
+
+/* Individual Hairline Bar */
+.eq-bar {
+  width: 1.5px;
+  background-color: var(--primary);
+  border-radius: 1px;
+  transition: height 0.3s ease, opacity 0.3s ease;
+}
+
+/* State: Playing — Smooth natural pulse keyframes */
+.sound-toggle-fixed.is-playing .eq-bar:nth-child(1) {
+  animation: eqPulse 1.2s ease-in-out infinite alternate;
+}
+.sound-toggle-fixed.is-playing .eq-bar:nth-child(2) {
+  animation: eqPulse 0.9s ease-in-out 0.2s infinite alternate;
+}
+.sound-toggle-fixed.is-playing .eq-bar:nth-child(3) {
+  animation: eqPulse 1.4s ease-in-out 0.4s infinite alternate;
+}
+.sound-toggle-fixed.is-playing .eq-bar:nth-child(4) {
+  animation: eqPulse 1.0s ease-in-out 0.1s infinite alternate;
+}
+
+@keyframes eqPulse {
+  0% {
+    height: 3px;
+  }
+  50% {
+    height: 13px;
+  }
+  100% {
+    height: 6px;
+  }
+}
+
+/* State: Muted / Paused — Flat resting lines */
+.sound-toggle-fixed.is-muted .eq-bar {
+  height: 2px !important;
+  opacity: 0.5;
+  background-color: var(--text-muted);
+}
+
+/* Label text */
+.sound-toggle-label {
+  font-family: var(--font-accent, 'Montserrat', sans-serif);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.sound-toggle-fixed:hover .sound-toggle-label {
+  color: var(--text-main);
+}
+
+.sound-toggle-fixed.is-playing .sound-toggle-label {
+  color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .sound-toggle-fixed {
+    bottom: 20px;
+    left: 18px;
+    padding: 7px 11px;
+    gap: 8px;
+  }
+
+  .sound-toggle-label {
+    display: none; /* Icon/bars only on mobile for ultimate minimalism */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sound-toggle-fixed.is-playing .eq-bar {
+    animation: none !important;
+    height: 8px !important;
+  }
+}

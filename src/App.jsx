@@ -1,22 +1,29 @@
-import React, { useState, useEffect } from 'react'
-import Navbar from './components/UI/Navbar'
-import Hero from './components/Sections/Hero'
-import About from './components/Sections/About'
-import Services from './components/Sections/Services'
-import Gallery from './components/Sections/Gallery'
-import Booking from './components/Sections/Booking'
-import Footer from './components/UI/Footer'
-import WhatsAppButton from './components/UI/WhatsAppButton'
-import AdminDashboard from './components/Admin/AdminDashboard'
-import AdminLogin from './components/Admin/AdminLogin'
-import AuthCallback from './components/Admin/AuthCallback'
-import { supabase } from './lib/supabase'
-import './index.css'
+import React, { useState, useEffect } from 'react';
+import Navbar from './components/UI/Navbar';
+import Hero from './components/Sections/Hero';
+import About from './components/Sections/About';
+import Services from './components/Sections/Services';
+import Experience from './components/Sections/Experience';
+import Gallery from './components/Sections/Gallery';
+import Testimonials from './components/Sections/Testimonials';
+import Booking from './components/Sections/Booking';
+import Footer from './components/UI/Footer';
+import WhatsAppButton from './components/UI/WhatsAppButton';
+import CustomCursor from './components/UI/CustomCursor';
+import Preloader from './components/UI/Preloader';
+import AdminDashboard from './components/Admin/AdminDashboard';
+import AdminLogin from './components/Admin/AdminLogin';
+import AuthCallback from './components/Admin/AuthCallback';
+import { supabase } from './lib/supabase';
+import useLenis from './hooks/useLenis';
+import { AudioProvider } from './context/AudioContext';
+import SoundToggle from './components/UI/SoundToggle';
+import './index.css';
 
 function App() {
   const [view, setView] = useState('home');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [spaSettings, setSpaSettings] = useState({
     spaName: 'Venus Elegant Spa',
@@ -24,10 +31,22 @@ function App() {
     address: 'Plaza Rubi Av. España #69, 3er nivel, local 303, Santo Domingo Este'
   });
 
+  // Enable Lenis Smooth Scroll on home view
+  useLenis();
+
   // Auth logic - runs once
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsLoggedIn(!!session);
+    const safetyTimer = setTimeout(() => {
+      setLoading(false);
+    }, 800);
+
+    supabase.auth.getSession().then(({ data }) => {
+      clearTimeout(safetyTimer);
+      setIsLoggedIn(!!data?.session);
+      setLoading(false);
+    }).catch((err) => {
+      clearTimeout(safetyTimer);
+      console.warn("Auth session check:", err);
       setLoading(false);
     });
 
@@ -39,7 +58,6 @@ function App() {
         window.location.hash = '#/admin';
       }
       if (event === 'USER_UPDATED') {
-        // Cuando se actualiza el usuario (ej: cambio de contraseña), asegurar que está logueado
         setIsLoggedIn(true);
       }
     });
@@ -57,7 +75,6 @@ function App() {
 
       if (hash.startsWith('#/admin')) {
         setView('admin');
-        // Check for recovery mode in hash or search params
         if (hash.includes('type=recovery') || search.includes('type=recovery')) {
           setIsResetting(true);
         }
@@ -121,7 +138,10 @@ function App() {
     };
   }, [view]);
 
-  if (loading) return null;
+  // Only show blank placeholder if actively verifying admin login
+  if (loading && view === 'admin') {
+    return <div style={{ minHeight: '100vh', backgroundColor: '#1E1713' }} />;
+  }
 
   // Handle auth callback from Supabase
   if (view === 'auth-callback') {
@@ -145,19 +165,34 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      <Navbar spaSettings={spaSettings} />
-      <main>
-        <Hero spaSettings={spaSettings} />
-        <About />
-        <Services />
-        <Gallery />
-        <Booking spaSettings={spaSettings} />
-      </main>
-      <Footer spaSettings={spaSettings} />
-      <WhatsAppButton spaSettings={spaSettings} />
-    </div>
-  )
+    <AudioProvider>
+      <div className="app-container">
+        {/* Luxury Preloader & Interactive Sound Consent Entry */}
+        <Preloader />
+
+        {/* Discrete Ambient Audio Equalizer Toggle (Bottom-Left) */}
+        <SoundToggle />
+
+        {/* Luxury Navbar */}
+        <Navbar spaSettings={spaSettings} />
+
+        {/* Main Luxury Experience */}
+        <main>
+          <Hero spaSettings={spaSettings} />
+          <About />
+          <Services />
+          <Experience />
+          <Gallery />
+          <Testimonials />
+          <Booking spaSettings={spaSettings} />
+        </main>
+
+        {/* Editorial Footer & Floating WhatsApp */}
+        <Footer spaSettings={spaSettings} />
+        <WhatsAppButton spaSettings={spaSettings} />
+      </div>
+    </AudioProvider>
+  );
 }
 
-export default App
+export default App;

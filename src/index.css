@@ -1,111 +1,307 @@
+/* ==========================================================================
+   VENUS ELEGANT SPA — REFINED EDITORIAL LUXURY DESIGN SYSTEM
+   Level: Awwwards / 5-Star Hotel Spa Minimal
+   ========================================================================== */
+
 :root {
-  --primary: #AC6D39;
-  --primary-light: #C58B5F;
-  --bg-primary: #FDF9F6;
-  --bg-secondary: #F5E6DA;
-  --accent: #DBC7BB;
-  --text-main: #4A3E37;
-  --text-muted: #7A6F68;
+  /* Strict 3-Tone Palette */
+  --bg-primary: #FAF6F0;
+  --bg-secondary: #F3ECE2;
+  --bg-dark: #1E1713;
+  --text-main: #2A231F;
+  --text-muted: #786E65;
+  --text-light: #A49B92;
+  --primary: #A46838;
+  --primary-hover: #8D562B;
   --white: #FFFFFF;
-  --glass: rgba(255, 255, 255, 0.7);
-  --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Architectural Lines (No heavy borders or cards) */
+  --line-subtle: rgba(164, 104, 56, 0.16);
+  --line-light: rgba(42, 35, 31, 0.08);
+  --line-white: rgba(255, 255, 255, 0.12);
+
+  /* Spacing Scale (8pt system, generous breathing room) */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 40px;
+  --space-xl: 64px;
+  --space-2xl: 96px;
+  --space-3xl: 160px;
+
+  /* Typography Stacks */
+  --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-accent: 'Montserrat', sans-serif;
+
+  /* Strict Radii (Architectural & Crisp, No pill/bubble look) */
+  --radius-none: 0px;
+  --radius-subtle: 2px;
+  --radius-card: 4px;
+
+  /* Timing & Easing (Slow, intentional, cinematic) */
+  --ease-luxury: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-normal: 0.8s;
+  --duration-slow: 1.2s;
 }
 
-* {
+/* ==========================================================================
+   BASE RESET
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+/* Performance-optimized body rendering */
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-sans);
   background-color: var(--bg-primary);
   color: var(--text-main);
-  line-height: 1.6;
-  overflow-x: hidden;
+  line-height: 1.8;
+  font-weight: 350;
+  overflow-x: clip;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+::selection {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+/* ==========================================================================
+   EDITORIAL TYPOGRAPHY
+   ========================================================================== */
 
 h1,
 h2,
 h3,
 h4 {
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
+  font-family: var(--font-serif);
+  font-weight: 350;
   color: var(--text-main);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
 }
 
+em {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 350;
+  color: var(--primary);
+}
+
+p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.85;
+  max-width: 62ch;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+img,
+video {
+  max-width: 100%;
+  display: block;
+}
+
+/* Section Spacing: 140px to 180px in desktop, 90px in mobile */
 section {
-  padding: 100px 5%;
+  padding: 160px 7%;
   position: relative;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
+@media (max-width: 768px) {
+  section {
+    padding: 95px 6%;
+  }
 }
 
-.btn {
-  display: inline-block;
-  padding: 16px 40px;
-  border-radius: 50px;
-  text-decoration: none;
-  font-weight: 700;
-  transition: var(--transition);
-  cursor: pointer;
-  border: none;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.95rem;
-  letter-spacing: 2px;
+.container {
+  max-width: 1320px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.container-narrow {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Editorial Category Tag (Small, spaced uppercase) */
+.editorial-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  color: var(--primary);
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.editorial-kicker::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background-color: var(--primary);
+}
+
+/* Minimal Luxury Button (Crisp line, no heavy shadows or rounded bubbles) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 36px;
+  border-radius: var(--radius-none);
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid var(--text-main);
+  background: transparent;
+  color: var(--text-main);
+  transition: all 0.4s var(--ease-luxury);
+  position: relative;
+}
+
+.btn:hover {
+  background-color: var(--text-main);
+  color: var(--white);
 }
 
 .btn-primary {
-  background-color: var(--primary);
+  background-color: var(--text-main);
   color: var(--white);
+  border-color: var(--text-main);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-light);
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(172, 109, 57, 0.2);
-}
-
-.btn-outline {
-  border: 2px solid var(--primary);
-  color: var(--primary);
-  background: transparent;
-}
-
-.btn-outline:hover {
   background-color: var(--primary);
+  border-color: var(--primary);
   color: var(--white);
 }
 
-/* Glassmorphism */
-.glass-card {
-  background: var(--glass);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
+.btn-outline {
+  border-color: var(--line-subtle);
+  color: var(--text-main);
 }
 
-/* Custom Animations */
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
-
-  100% {
-    transform: translateY(0px);
-  }
+.btn-outline:hover {
+  border-color: var(--text-main);
+  background-color: var(--text-main);
+  color: var(--white);
 }
 
-.animate-float {
-  animation: float 4s ease-in-out infinite;
+/* Text link with elegant expanding underline */
+.link-editorial {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-main);
+  font-weight: 500;
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.link-editorial::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--primary);
+  transform: scaleX(0.3);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease-luxury);
+}
+
+.link-editorial:hover::after {
+  transform: scaleX(1);
+}
+
+/* Fine 1px Hairline Divider */
+.hairline {
+  width: 100%;
+  height: 1px;
+  background-color: var(--line-subtle);
+  border: none;
+}
+
+/* ==========================================================================
+   DARK SECTION CONTRAST & TYPOGRAPHY
+   Ensures titles on dark backgrounds are always crisp, luminous warm white.
+   ========================================================================== */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] .section-header-editorial h2 {
+  color: #FAF6F0 !important;
+}
+
+[data-theme="dark"] p,
+[data-theme="dark"] .section-header-editorial p {
+  color: rgba(250, 246, 240, 0.72) !important;
+}
+
+[data-theme="dark"] .editorial-kicker,
+[data-theme="dark"] .section-header-editorial .editorial-kicker {
+  color: #D49A58 !important;
+}
+
+[data-theme="dark"] em {
+  color: #D49A58 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

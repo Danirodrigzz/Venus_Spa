@@ -1,87 +1,325 @@
-.about {
-    background-color: var(--bg-primary);
+/* ==========================================================================
+   VENUS ELEGANT SPA — CINEMATIC ABOUT (NOSOTROS)
+   Full-bleed image column bleeds left edge. Narrative column with deep serif.
+   Parallax drift, scroll-illuminated manifesto, bold stats.
+   ========================================================================== */
+
+.about-cinematic {
+  background-color: var(--bg-primary, #FAF6F0);
+  position: relative;
+  overflow: hidden;
+  /* Override global section padding: zero horizontal so image bleeds */
+  padding: 0 !important;
 }
 
-.about-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    gap: 80px;
+/* 2-column full-height grid */
+.about-cinematic-grid {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  min-height: 100vh;
 }
 
-.about-image {
-    position: relative;
+/* =====================================================
+   IMAGE COLUMN — perfectly aligned with narrative
+   ===================================================== */
+.about-image-column {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  min-height: 100%;
 }
 
-.about-image img {
-    width: 100%;
-    border-radius: 20px;
-    box-shadow: 20px 20px 60px rgba(0, 0, 0, 0.1);
+.about-image-overflow-clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
 
-.about-badge {
-    position: absolute;
-    bottom: -30px;
-    right: -30px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 320px;
-    overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+.about-parallax-image-wrap {
+  width: 100%;
+  height: 100%;
+  will-change: transform;
 }
 
-.badge-img {
-    width: 100%;
-    height: auto;
-    display: block;
+.about-parallax-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 0 !important;
 }
 
-.about-content .title {
-    font-size: 3.5rem;
-    margin-bottom: 25px;
+.about-parallax-asset {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 50%;
 }
 
-.about-content p {
-    color: var(--text-muted);
-    margin-bottom: 20px;
+/* Floating caption at bottom of image */
+.about-image-caption-float {
+  position: absolute;
+  bottom: 36px;
+  left: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  pointer-events: none;
 }
 
-.about-stats {
-    display: flex;
-    gap: 50px;
-    margin-top: 40px;
+.about-img-tag {
+  font-family: var(--font-accent);
+  font-size: 0.60rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #D38B57;
 }
 
-.stat h3 {
-    font-size: 2rem;
-    color: var(--primary);
-    margin-bottom: 5px;
+.about-img-divider {
+  color: rgba(250, 246, 240, 0.35);
+  font-size: 0.9rem;
 }
 
-.stat span {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.about-img-desc {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(250, 246, 240, 0.55);
 }
 
+/* =====================================================
+   NARRATIVE COLUMN
+   ===================================================== */
+.about-narrative-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(60px, 8vh, 100px) 7% clamp(60px, 8vh, 100px) 8%;
+  background-color: var(--bg-primary, #FAF6F0);
+  position: relative;
+  box-sizing: border-box;
+}
+
+/* Subtle vertical rule at left edge of text column */
+.about-narrative-column::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12%;
+  bottom: 12%;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(164, 104, 56, 0.3) 30%,
+    rgba(164, 104, 56, 0.3) 70%,
+    transparent 100%
+  );
+}
+
+.about-narrative-inner {
+  width: 100%;
+  max-width: 580px;
+}
+
+.about-section-header {
+  margin-bottom: 28px !important;
+}
+
+/* Lead paragraph */
+.about-lead-text {
+  font-size: clamp(1.05rem, 1.15vw, 1.16rem);
+  line-height: 1.82;
+  color: var(--text-main, #2A231F);
+  margin-bottom: 18px;
+  font-weight: 350;
+  max-width: 52ch;
+}
+
+.about-body-text {
+  font-size: clamp(0.92rem, 1vw, 0.98rem);
+  line-height: 1.8;
+  color: var(--text-muted, #786E65);
+  margin-bottom: 0;
+  max-width: 52ch;
+}
+
+/* =====================================================
+   SCROLL-ILLUMINATED MANIFESTO
+   ===================================================== */
+.about-manifesto-block {
+  position: relative;
+  margin: 32px 0 36px;
+  padding: 24px 0 24px 24px;
+}
+
+.manifesto-accent-line {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    #D38B57 30%,
+    #A46838 70%,
+    transparent 100%
+  );
+}
+
+.about-illuminated-quote {
+  font-family: var(--font-serif, 'Cormorant Garamond', Georgia, serif);
+  font-style: italic;
+  font-size: clamp(1.4rem, 2.2vw, 1.95rem);
+  line-height: 1.42;
+  color: var(--text-main, #2A231F);
+  margin: 0;
+  max-width: 48ch;
+}
+
+.manifesto-word {
+  display: inline-block;
+}
+
+/* =====================================================
+   STATS ROW
+   ===================================================== */
+.about-stats-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line-subtle, rgba(164, 104, 56, 0.16));
+}
+
+.stats-divider {
+  width: 1px;
+  height: 52px;
+  background-color: var(--line-subtle, rgba(164, 104, 56, 0.16));
+  align-self: center;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-number {
+  font-family: var(--font-serif);
+  font-size: clamp(2.6rem, 4vw, 3.4rem);
+  font-weight: 300;
+  line-height: 1;
+  color: var(--primary, #A46838);
+}
+
+.stat-label {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted, #786E65);
+}
+
+/* =====================================================
+   TABLET
+   ===================================================== */
 @media (max-width: 991px) {
-    .about-container {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 50px;
-    }
+  .about-cinematic-grid {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
 
-    .about-badge {
-        position: static;
-        margin: 30px auto 0;
-        width: fit-content;
-    }
+  .about-image-column {
+    height: 60vw;
+    min-height: 320px;
+    position: relative;
+  }
 
-    .about-stats {
-        justify-content: center;
-    }
+  .about-image-overflow-clip {
+    position: relative;
+    top: auto;
+    height: 100%;
+    inset: 0;
+  }
+
+  .about-parallax-image-wrap {
+    height: 100%;
+    margin-top: 0;
+  }
+
+  .about-narrative-column {
+    padding: 70px 6%;
+  }
+
+  .about-narrative-column::before { display: none; }
+
+  .about-narrative-inner { max-width: 100%; }
+}
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+@media (max-width: 600px) {
+  .about-image-column {
+    height: 72vw;
+    min-height: 260px;
+  }
+
+  .about-narrative-column {
+    padding: 48px 6%;
+  }
+
+  .about-manifesto-block {
+    margin: 22px 0 26px;
+    padding: 16px 0 16px 16px;
+  }
+
+  .about-illuminated-quote {
+    font-size: clamp(1.2rem, 4.6vw, 1.55rem);
+    line-height: 1.45;
+  }
+
+  .about-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding-top: 24px;
+    width: 100%;
+    align-items: start;
+  }
+
+  .stats-divider {
+    display: none;
+  }
+
+  .stat-item {
+    min-width: 0;
+    gap: 4px;
+  }
+
+  .stat-number {
+    font-size: clamp(1.65rem, 6.5vw, 2.2rem);
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .stat-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 360px) {
+  .stat-number {
+    font-size: 1.45rem;
+  }
+
+  .stat-label {
+    font-size: 0.52rem;
+    letter-spacing: 0.08em;
+  }
 }

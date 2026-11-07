@@ -1,103 +1,457 @@
-.services {
-    background-color: var(--bg-secondary);
+/* ==========================================================================
+   VENUS ELEGANT SPA — CARTA DE RITUALES (ULTRA-LUXURY MASTER EDITION)
+   - Cero etiquetas: cada fila muestra estrictamente número, nombre, duración y precio.
+   - Columna fotográfica fija a sangre (100vh) a la derecha, sin marco ni cortes.
+   - Fundido gradual entre la fotografía y el fondo oscuro.
+   - Tipografía serif monumental y jerarquía silenciosa.
+   ========================================================================== */
+
+.services-master-section {
+  background-color: #0E0907;
+  color: #FAF6F0;
+  position: relative;
+  padding: 100px 0 120px;
+  overflow: visible; /* NUNCA overflow:hidden aquí para no romper position:sticky */
+  box-sizing: border-box;
 }
 
-.section-header {
-    text-align: center;
-    margin-bottom: 60px;
+/* Luz ámbar difusa detrás de la foto, como luz de velas */
+.services-ambient-glow {
+  position: absolute;
+  right: 15%;
+  top: 25%;
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(
+    circle,
+    rgba(211, 139, 87, 0.12) 0%,
+    rgba(180, 100, 50, 0.05) 50%,
+    transparent 72%
+  );
+  pointer-events: none;
+  filter: blur(70px);
+  z-index: 1;
 }
 
-.subtitle {
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    font-size: 0.8rem;
-    color: var(--primary);
-    font-weight: 600;
+.services-master-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  /* Espaciado generoso a la izquierda para el contenido; cero a la derecha para sangre completa */
+  padding: 0 0 0 clamp(24px, 5vw, 96px);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
 }
 
-.title {
-    font-size: 3rem;
-    margin-top: 10px;
+/* ==========================================================================
+   1. Cabecera Sobria y Equilibrada
+   ========================================================================== */
+.services-master-header {
+  margin-bottom: 48px;
+  padding-right: clamp(24px, 5vw, 96px);
 }
 
-.services-grid {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    gap: 30px;
+.services-master-section .section-title-wrap {
+  color: #FAF6F0;
+}
+.services-master-section .section-title-main {
+  color: #FAF6F0;
+}
+.services-master-section .section-title-desc {
+  color: rgba(250, 246, 240, 0.72);
 }
 
-@media (min-width: 768px) {
-    .services-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+/* ==========================================================================
+   2. Estructura Principal: Lista Editorial + Foto Fija 100vh a Sangre
+   ========================================================================== */
+.services-master-stage-split {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: clamp(32px, 4vw, 64px);
+  /* ALIGN-ITEMS: STRETCH garantiza que la columna derecha ocupe toda la altura de la lista */
+  align-items: stretch;
+  position: relative;
+  width: 100%;
 }
 
-@media (min-width: 1024px) {
-    .services-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+/* ==========================================================================
+   3. Columna de la Lista Continua
+   ========================================================================== */
+.services-master-list-col {
+  width: 100%;
+  position: relative;
 }
 
-.service-card {
-    padding: 40px;
-    text-align: center;
-    transition: var(--transition);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* Marca de agua casi imperceptible con la palabra 'Rituales' */
+.services-watermark-bg {
+  position: absolute;
+  left: -20px;
+  top: 80px;
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-size: clamp(6rem, 12vw, 13rem);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(250, 246, 240, 0.025);
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+  z-index: 0;
+  letter-spacing: 0.04em;
 }
 
-.service-card:hover {
-    transform: translateY(-10px);
-    background: var(--white);
-    box-shadow: 0 20px 40px rgba(172, 109, 57, 0.1);
+.services-master-list {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
-.service-icon {
-    color: var(--primary);
-    margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 70px;
-    height: 70px;
-    background: var(--bg-primary);
-    border-radius: 50%;
-    transition: var(--transition);
+.master-item-row {
+  position: relative;
+  transition: opacity 0.4s ease;
 }
 
-.service-card:hover .service-icon {
-    background: var(--primary);
-    color: var(--white);
+/* El ritual activo se ve en blanco cálido y los demás se atenúan */
+.master-item-row.is-dimmed {
+  opacity: 0.32;
 }
 
-.service-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
+.master-item-row.is-focused {
+  opacity: 1;
 }
 
-.service-card p {
-    font-size: 0.95rem;
-    color: var(--text-muted);
-    margin-bottom: 20px;
+/* Fila de resumen del ritual (Cero etiquetas, sólo número, nombre, duración y precio) */
+.master-row-summary {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: clamp(14px, 1.8vw, 24px);
+  padding: clamp(22px, 3.2vh, 32px) 0;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
 }
 
-.service-price {
-    font-weight: 700;
-    color: var(--primary);
-    font-size: 1.1rem;
+/* Número pequeño y tenue en cobre */
+.master-item-num {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.70rem;
+  letter-spacing: 0.20em;
+  color: rgba(211, 139, 87, 0.75);
+  font-weight: 500;
+  min-width: 24px;
 }
 
-.services-more {
-    text-align: center;
-    margin-top: 50px;
-    color: var(--text-muted);
-    font-style: italic;
-    font-size: 1.1rem;
+/* Título en serif grande sin etiquetas */
+.master-item-title {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-size: clamp(1.75rem, 2.6vw, 2.35rem);
+  font-weight: 350;
+  line-height: 1.14;
+  color: #FAF6F0;
+  margin: 0;
+  letter-spacing: -0.01em;
+  transition: color 0.35s ease;
 }
 
-@media (max-width: 768px) {
-    .title {
-        font-size: 2.2rem;
-    }
+.master-row-summary:hover .master-item-title {
+  color: #FAF6F0;
+}
+
+/* Columnas fijas de Duración, Precio y Flecha */
+.master-item-meta-columns {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 16px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.master-col-duration {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: rgba(250, 246, 240, 0.48);
+  font-weight: 400;
+}
+
+.master-col-price {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  color: #D49A58;
+  font-weight: 400;
+}
+
+.master-col-arrow {
+  color: rgba(211, 139, 87, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transition: transform 0.35s ease, color 0.35s ease;
+}
+
+.master-row-summary:hover .master-col-arrow {
+  color: #D49A58;
+  transform: translateX(3px);
+}
+
+.master-col-arrow.is-active {
+  color: #D49A58;
+  transform: rotate(90deg);
+}
+
+/* Línea divisoria finísima con degradado cobre que se desvanece en extremos */
+.master-row-separator {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(211, 139, 87, 0.22) 15%,
+    rgba(211, 139, 87, 0.22) 85%,
+    transparent 100%
+  );
+}
+
+/* ==========================================================================
+   4. Contenido Expandido del Ritual
+   ========================================================================== */
+.master-row-expanded-wrap {
+  overflow: hidden;
+}
+
+.master-expanded-content {
+  padding: 0 0 clamp(24px, 3vh, 32px) clamp(38px, 2.5vw, 48px);
+}
+
+.master-expanded-desc {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: rgba(250, 246, 240, 0.80);
+  margin: 0 0 16px 0;
+  max-width: 560px;
+  font-weight: 350;
+}
+
+/* Beneficios en una sola línea separada por puntos (sin mayúsculas gritonas) */
+.master-expanded-benefits {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.70rem;
+  letter-spacing: 0.14em;
+  color: rgba(211, 139, 87, 0.88);
+  margin-bottom: 22px;
+  font-weight: 450;
+}
+
+/* Botón Discreto de Reserva */
+.master-expanded-actions {
+  display: flex;
+  align-items: center;
+}
+
+.master-reserve-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 22px;
+  border-radius: 9999px;
+  border: 1px solid rgba(211, 139, 87, 0.45);
+  background: rgba(211, 139, 87, 0.08);
+  color: #FAF6F0;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.master-reserve-btn:hover {
+  background: rgba(211, 139, 87, 0.25);
+  border-color: rgba(211, 139, 87, 0.85);
+  box-shadow: 0 4px 16px rgba(211, 139, 87, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-arrow {
+  transition: transform 0.3s ease;
+}
+
+.master-reserve-btn:hover .btn-arrow {
+  transform: translate(2px, -2px);
+}
+
+/* Preview fotográfico visible sólo en móvil */
+.master-mobile-photo-box {
+  display: none;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.master-mobile-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.03) brightness(0.96);
+}
+
+.master-mobile-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 40%,
+    rgba(14, 9, 7, 0.8) 100%
+  );
+}
+
+/* ==========================================================================
+   5. Escenario Fotográfico a Sangre 100VH FIJO
+   - Ocupa toda la altura de la lista (height: 100%)
+   - La foto dentro tiene position: sticky; top: 0; height: 100vh;
+   - Se mantiene siempre visible, completa y centrada hasta el final de la lista.
+   ========================================================================== */
+.services-master-photo-col {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.master-sticky-photo-stage {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: transparent;
+}
+
+.master-photo-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.master-fullbleed-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.03) brightness(0.97);
+  transform: scale(1.0);
+  animation: masterPhotoKenBurns 24s ease-in-out infinite alternate;
+}
+
+@keyframes masterPhotoKenBurns {
+  0% { transform: scale(1.0); }
+  100% { transform: scale(1.045); }
+}
+
+/* Degradado lateral izquierdo largo y suave que funde la foto con el fondo */
+.master-photo-fade-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    #0E0907 0%,
+    rgba(14, 9, 7, 0.94) 16%,
+    rgba(14, 9, 7, 0.55) 44%,
+    rgba(14, 9, 7, 0.12) 72%,
+    transparent 100%
+  );
+}
+
+/* Viñeta sutil en bordes superior e inferior */
+.master-photo-vertical-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(14, 9, 7, 0.55) 0%,
+    transparent 14%,
+    transparent 86%,
+    rgba(14, 9, 7, 0.70) 100%
+  );
+}
+
+/* ==========================================================================
+   6. Responsive Breakpoints
+   ========================================================================== */
+@media (max-width: 992px) {
+  .services-master-container {
+    padding: 0 24px;
+  }
+
+  .services-master-header {
+    padding-right: 0;
+  }
+
+  .services-master-stage-split {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .services-master-photo-col {
+    display: none; /* En móvil se oculta el escenario lateral */
+  }
+
+  .master-mobile-photo-box {
+    display: block; /* Se despliega la foto a todo el ancho encima del texto */
+  }
+
+  .master-expanded-content {
+    padding-left: 0;
+  }
+
+  .master-item-title {
+    font-size: 1.55rem;
+  }
+
+  .master-item-meta-columns {
+    grid-template-columns: 80px 18px;
+  }
+
+  .master-col-duration {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .services-master-section {
+    padding: 70px 0 80px;
+  }
+
+  .master-row-summary {
+    padding: 18px 0;
+    gap: 12px;
+  }
+
+  .master-item-title {
+    font-size: 1.35rem;
+  }
+
+  .master-col-price {
+    font-size: 1rem;
+  }
+
+  .master-item-meta-columns {
+    grid-template-columns: 74px 16px;
+    gap: 6px;
+  }
 }

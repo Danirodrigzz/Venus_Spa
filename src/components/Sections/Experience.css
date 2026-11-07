@@ -1,0 +1,449 @@
+/* ==========================================================================
+   VENUS ELEGANT SPA — EL RITUAL EN CUATRO ETAPAS (LUXURY EDITORIAL)
+   - Lienzo fotográfico a sangre completa (100vw × 100vh).
+   - Ken Burns cinematográfico lento y partículas suspendidas.
+   - Texto esencial flotando en la esquina inferior izquierda.
+   - Navegación vertical discreta en el borde derecho (trazos finos + ámbar).
+   - Cero cajas rígidas, cero marcos, máxima calma y protagonismo visual.
+   ========================================================================== */
+
+.experience-pinned-section {
+  position: relative;
+  width: 100%;
+  height: 380vh;
+  color: #FAF6F0;
+  box-sizing: border-box;
+  overflow: clip;
+  background-color: #0E0907;
+  margin: 0;
+  padding: 0;
+}
+
+.experience-pinned-section.is-mobile {
+  height: auto;
+  overflow: visible;
+}
+
+/* ==========================================================================
+   2. Viewport a Sangre Completa (Sticky 100vh)
+   ========================================================================== */
+.ritual-fullbleed-viewport {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Fondo fotográfico a sangre completa */
+.ritual-fullbleed-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.fullbleed-photo-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity;
+}
+
+.fullbleed-photo-layer.is-active {
+  opacity: 1;
+  z-index: 2;
+}
+
+.fullbleed-photo-asset {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.0);
+  animation: fullbleedKenBurns 22s ease-in-out infinite alternate;
+  filter: contrast(1.03) brightness(0.97);
+}
+
+@keyframes fullbleedKenBurns {
+  0% { transform: scale(1.0) translate(0, 0); }
+  100% { transform: scale(1.045) translate(-0.6%, -1%); }
+}
+
+/* Recorte específico para nuevo2.jpg (Lounge / Bar) */
+.photo-bar-crop {
+  object-position: 68% 18% !important;
+}
+
+/* Degradado suave sólo en la esquina inferior izquierda detrás del texto */
+.ritual-scrim-bottom-left {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 75% 75% at 15% 82%,
+    rgba(14, 9, 7, 0.88) 0%,
+    rgba(14, 9, 7, 0.65) 40%,
+    rgba(14, 9, 7, 0.22) 70%,
+    transparent 100%
+  );
+}
+
+/* Viñeta cinematográfica muy sutil en los bordes */
+.ritual-scrim-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow: inset 0 0 120px rgba(10, 6, 4, 0.65);
+}
+
+/* Canvas de motas de luz cálida suspendidas */
+.sanctuary-particles-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* ==========================================================================
+   3. Marca de Agua Casi Imperceptible
+   ========================================================================== */
+.ritual-watermark-phase {
+  position: absolute;
+  right: 5vw;
+  bottom: 6vh;
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-size: clamp(5rem, 13vw, 13rem);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  color: rgba(250, 246, 240, 0.035);
+  line-height: 1;
+  text-transform: uppercase;
+  max-width: 75vw;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   4. Bloque de Texto en Esquina Inferior Izquierda
+   ========================================================================== */
+.ritual-bottom-left-content {
+  position: absolute;
+  left: clamp(28px, 6vw, 96px);
+  bottom: clamp(32px, 7vh, 80px);
+  max-width: min(540px, 50vw);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.ritual-clean-text-stack {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 1. Kicker / Nombre de etapa */
+.ritual-kicker-clean {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.kicker-rule {
+  width: 22px;
+  height: 1px;
+  background-color: #D49A58;
+}
+
+.kicker-phase-text {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.66rem;
+  letter-spacing: 0.28em;
+  color: #D49A58;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* 2. Título principal */
+.ritual-hero-title {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-size: clamp(2.3rem, 4.2vw, 3.8rem);
+  font-weight: 350;
+  line-height: 1.08;
+  color: #FAF6F0;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.01em;
+}
+
+/* 3. Subtítulo poético */
+.ritual-hero-sub {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-style: italic;
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+  color: rgba(226, 184, 150, 0.9);
+  margin: 0 0 14px 0;
+  font-weight: 300;
+}
+
+/* 4. Descripción breve */
+.ritual-hero-desc {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: rgba(250, 246, 240, 0.78);
+  margin: 0 0 16px 0;
+  max-width: 440px;
+  font-weight: 350;
+}
+
+/* 5. Highlight / Cifra única real */
+.ritual-hero-highlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 9999px;
+  background: rgba(211, 139, 87, 0.12);
+  border: 1px solid rgba(211, 139, 87, 0.28);
+  margin-bottom: 20px;
+  align-self: flex-start;
+  backdrop-filter: blur(8px);
+}
+
+.highlight-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #D49A58;
+  box-shadow: 0 0 6px #D49A58;
+}
+
+.highlight-text {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  color: rgba(250, 246, 240, 0.92);
+  font-weight: 450;
+}
+
+/* 6. Cita protagonista */
+.ritual-hero-quote {
+  border-left: 1.5px solid rgba(211, 139, 87, 0.6);
+  padding-left: 16px;
+  margin: 0;
+}
+
+.quote-text-clean {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-style: italic;
+  font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+  color: rgba(250, 246, 240, 0.88);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ==========================================================================
+   5. Navegación Vertical Discreta en el Borde Derecho
+   ========================================================================== */
+.ritual-vertical-edge-nav {
+  position: absolute;
+  right: clamp(24px, 4vw, 56px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+}
+
+.vertical-edge-track {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  align-items: flex-end;
+}
+
+.vertical-stage-tick-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  outline: none;
+  position: relative;
+  transition: opacity 0.3s ease;
+}
+
+.vertical-stage-tick-btn:hover {
+  opacity: 1;
+}
+
+/* Trazo fino horizontal */
+.stage-tick-line {
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  background-color: rgba(250, 246, 240, 0.35);
+  border-radius: 2px;
+  transition:
+    width 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+/* Estado activo: se alarga e ilumina en ámbar */
+.vertical-stage-tick-btn.is-active .stage-tick-line {
+  width: 44px;
+  background-color: #D49A58;
+  box-shadow: 0 0 10px rgba(212, 154, 88, 0.7);
+}
+
+.stage-tick-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  order: -1; /* Coloca el texto a la izquierda del trazo */
+}
+
+.tick-phase-name {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-size: 0.95rem;
+  font-style: italic;
+  color: #FAF6F0;
+  letter-spacing: 0.04em;
+}
+
+.tick-phase-counter {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  color: #D49A58;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   6. MÓVIL: Experiencia Táctil Inmersiva
+   ========================================================================== */
+.ritual-mobile-immersive {
+  position: relative;
+  width: 100%;
+}
+
+.mobile-immersive-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 20px;
+  background: rgba(14, 9, 7, 0.95);
+  border-bottom: 1px solid rgba(211, 139, 87, 0.18);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  color: #D49A58;
+}
+
+.mobile-snap-stages {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-stage-item {
+  position: relative;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 32px 24px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.mobile-stage-photo-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.mobile-stage-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: contrast(1.03) brightness(0.95);
+}
+
+.mobile-stage-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(14, 9, 7, 0.2) 0%,
+    rgba(14, 9, 7, 0.6) 45%,
+    rgba(14, 9, 7, 0.95) 85%
+  );
+}
+
+.mobile-stage-content {
+  position: relative;
+  z-index: 2;
+  color: #FAF6F0;
+}
+
+.mobile-stage-title {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-size: 2.2rem;
+  line-height: 1.1;
+  font-weight: 350;
+  margin: 6px 0;
+}
+
+.mobile-stage-sub {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: #D49A58;
+  margin: 0 0 10px 0;
+}
+
+.mobile-stage-desc {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: rgba(250, 246, 240, 0.82);
+  margin-bottom: 12px;
+}
+
+.mobile-quote-wrap {
+  border-left: 1.5px solid rgba(211, 139, 87, 0.6);
+  padding-left: 14px;
+  margin: 16px 0 0 0;
+}
+
+.mobile-quote-body {
+  font-family: var(--font-serif, 'Cormorant Garamond', serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: rgba(250, 246, 240, 0.88);
+  line-height: 1.5;
+  margin: 0;
+}
